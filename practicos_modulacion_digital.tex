@@ -1,0 +1,529 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{amssymb}
+\usepackage{amsthm}
+%\usepackage{mathtools}
+\usepackage{ifthen}
+\usepackage[utf8]{inputenc}
+%\usepackage{lmodern}
+\usepackage[adobe-utopia]{mathdesign}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage[top=2.5cm,bottom=2.5cm,left=2cm,right=2cm]{geometry}
+%\setlength{\parskip}{\baselineskip}
+\usepackage[spanish,es-noquoting]{babel}
+\usepackage{float}
+\usepackage[    pdftex,unicode=true,
+        pdfdisplaydoctitle=true,
+        colorlinks,
+        linkcolor=black,]{hyperref}
+
+\usepackage[usenames,dvipsnames]{xcolor}
+
+\usepackage[font={scriptsize,sf},format=plain,labelfont={bf},labelsep=period,skip=-0.5pt,justification=centering]{caption}
+%\usepackage[font+=scriptsize,skip=-0.5pt]{subcaption}
+
+%\usepackage{indentfirst}
+%\usepackage{placeins}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{babel}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{circuitikz}
+%\usepackage{rotating}
+%\usepackage{lscape}
+%\usepackage{pifont}
+\usepackage{siunitx}
+\DeclareSIUnit{\baud}{baudios}
+\DeclareMathOperator{\sinc}{sinc}
+%environment problema
+\newcounter{numejer}[section]
+\newenvironment{ejercicio}[1][]{
+\addtocounter{numejer}{1} 
+\noindent \large \textbf{Ejercicio \arabic{section}.\arabic{numejer}} \ifthenelse{\equal{#1}{}}{}{\emph{(#1)}}
+
+\smallskip
+}{
+\bigskip
+}
+
+\newenvironment{blockdiagram}[1][]{%
+\begin{tikzpicture}[
+     block/.style={
+    % The shape:
+    rectangle,
+    % The size:
+    minimum size=6mm,draw,
+    % The border:
+    thick,
+    },
+    operator/.style={
+    circle,draw,
+    minimum size=7mm,
+    inner sep=1mm,
+    thick},
+    punto/.style={coordinate},auto,
+    etiqueta/.style={rectangle,inner sep=0mm},
+    multD/.style={isosceles triangle,draw,isosceles triangle apex angle=50,shape border rotate =-90,thick},#1]
+}{\end{tikzpicture}}
+
+
+\title{Prácticos de Modulación Digital}
+\author{Universidad ORT Uruguay}
+\date{Curso 2024}
+
+\begin{document}
+\maketitle
+
+\section{Modulación PAM en banda base}
+
+\begin{ejercicio}
+Un sistema de comunicación digital envía una señal PAM digital NRZ cuaternaria, con símbolos independientes $a_k=\{0,A,2A,3A\}$. Las probabilidades de ocurrencia de cada símbolo son $2/5$, $2/5$, $1/10$ y $1/10$, respectivamente. Calcule y bosqueje la densidad espectral de potencia de la señal trasmitida.
+\end{ejercicio}
+
+\begin{ejercicio}
+        Sea una señal PAM digital polar binaria $x(t)$ que utiliza pulsos rectangulares $p(t)$ de ancho $T_s$, con formato RZ (retorno a cero en $T_z<T_s$).
+        \begin{enumerate}
+        \item Asumiendo que los símbolos $a_k=\{A,-A\}$ son independientes y equiprobables, bosqueje la densidad espectral de potencia y calcula la potencia de la señal $\langle x^2(t)\rangle$.
+        \item Supongamos ahora que la trasmisión es en formato NRZ y $P(A)=\alpha$ y $P(-A)=1-\alpha$, es decir, los símbolos no son equiprobables. Demuestre que $\langle x^2(t)\rangle$ no depende de $\alpha$.
+        \end{enumerate}                
+\end{ejercicio}
+        
+\begin{ejercicio}
+Una computadora genera palabras de 16 bits a una velocidad de 20.000 palabras por segundo. Determinar el ancho de banda mínimo necesario para trasmitirlas usando un sistema de señalización binario. Calcule el número de símbolos mínimo de un sistema M-ario si el ancho de banda de trasmisión disponible es de 60\unit{\kHz}.
+\end{ejercicio}
+
+\begin{ejercicio}
+        Un dispositivo debe transmitir información a una tasa de 56kbps utilizando señalización binaria y pulsos de Nyquist con exceso de ancho de banda $\alpha$.
+        \begin{enumerate}
+        \item Calcule el ancho de banda necesario para la transmisión para $\alpha\in\left\{0,\frac{1}{4},\frac{1}{2},1\right\}$.
+        \item Suponga ahora que el canal tiene un ancho de banda de 30kHz y se utiliza señalización $M$-aria. Calcule el mínimo valor de $M$ necesario en cada caso para los valores de $\alpha$ utilizados en la parte anterior.
+        \end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}
+En la figura se ilustran los espectros de dos pulsos, $\hat{g}(f)$ y $\hat{h}(f)$, con $0<\alpha<1$.
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}
+\begin{axis}[   x=3cm, y=1.5cm, axis lines=middle,  
+                xlabel=$f$,
+                x label style={anchor=north},
+                y label style={anchor=east},
+                xmin=-1,xmax=1,ymin=-.2,ymax=2,
+                xtick={-.1,.1}, ytick=\empty,
+                xticklabels={$\scriptstyle -\frac{\alpha}{2T_s}$,$\scriptstyle \frac{\alpha}{2T_s}$},
+                clip=false,
+                smooth
+            ]
+\addplot+[thick,mark=none,const plot, teal] coordinates
+{(-.9,0) (-.1,0) (-.1,1.4) (.1,1.4) (.1,0) (.9,0)} node[above left,midway]{\small $T_s/\alpha$};
+\node at (axis cs:-.8,1.5) {$\hat{g}(f)$};
+\end{axis}
+\end{tikzpicture}\hspace{1cm}
+\begin{tikzpicture}
+\begin{axis}[   x=3cm, y=1.5cm, axis lines=middle,  
+        xlabel=$f$,
+        x label style={anchor=north},
+        y label style={anchor=east},
+        xmin=-1,xmax=1,ymin=-.2,ymax=2,
+        xtick={-.8,.8}, ytick=\empty,
+        xticklabels={$\scriptstyle -\frac{1}{2T_s}$,$\scriptstyle \frac{}{2T_s}$},
+        clip=false,
+        smooth
+    ]
+\addplot+[thick,mark=none,const plot, teal] coordinates
+{(-.9,0) (-.8,0) (-.8,1) (.8,1) (.8,0) (.9,0)} node[above left,midway]{\small $T_s$};
+\node at (axis cs:-.8,1.5) {$\hat{h}(f)$};
+\end{axis}
+\end{tikzpicture}
+\end{figure}
+
+\begin{enumerate}
+\item Bosquejar el espectro $\hat{p}(f)=(\hat{g}*\hat{h})(f)$.
+\item Pruebe que $p(t)=\mathcal{F}^{-1}\{\hat{p}(f)\}$ cumple con la condición de ISI nula y calcule $p(0)$.
+\item El pulso $p(t)$ se utiliza para generar una señal PAM digital $x(t) = \sum_k a_kp(t-kT_s),$
+donde $a_k=\{-3A,-A,A,3A\}$ es una secuencia de símbolos
+independientes y equiprobables. Exprese analíticamente la densidad
+espectral de potencia de la señal $x(t)$.
+\item En las condiciones de la parte anterior y asumiendo $\alpha=\frac{2}{3}$,
+calcule la relación entre la velocidad de trasmisión de información y el ancho de banda del canal de trasmisión.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}
+Se considera el pulso de duración $T$, dado en $|t|\leqslant \frac{T}{2}$ por $ p(t)=1 - \frac{2 |t|}{T}$.  Se utiliza este pulso para una transmisión digital $\sum_k a_k p(t-kT_s)$, con símbolos unipolares binarios $a_k \in \{0,A\}$.
+
+\begin{enumerate}
+\item Supongamos primero que $T_s=T$.  Bosquejar la forma de onda para el mensaje binario  1-0-1-1-1-1-0. Calcular  y bosquejar la densidad espectral de potencia suponiendo símbolos independientes y equiprobables.
+\item Repetir las preguntas de la parte anterior siendo ahora $T_s=\frac{T}{2}$.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}
+        Sea la onda PAM $x(t)=\sum_k a_k p(t-k T_s)$ con pulsos $p(t)=\sinc(\pi f_s t)$. Los símbolos $a_k \in \{0, A, 2A, 3A\}$ son sorteados independientes y con probabilidades  respectivas 
+        $\frac{1}{2}, \frac{1}{4}, \frac{1}{8}, \frac{1}{8}.$
+        
+        \begin{enumerate}
+        \item Si el canal tiene transferencia $\hat{H}(f)$ como en la figura:
+
+        \begin{center}
+        \begin{tikzpicture}
+          \draw [->,thick] (-4,0) -- (4,0);
+          \draw [->,thick] (0,-0.5) -- (0,3);
+          \draw[teal, thick] (-4,1) -- (-2,1) -- (-2,2) -- (2,2) -- (2,1) -- (4,1);
+          \draw [dotted] (2,1) -- (2,0);
+          \draw [dotted] (-2,1) -- (-2,0);
+          \draw [dotted] (-2,1) -- (2,1);
+          \draw (4.3,0) node {$f$};
+          \draw (0,3.3) node {$\hat{H}(f)$};
+          \draw (2,-0.3) node {$\frac{f_s}{3}$};
+          \draw (-2,-0.3) node {$-\frac{f_s}{3}$};
+          \draw (-0.2,1.3) node {$\frac{1}{2}$};
+          \draw (-0.2,2.3) node {$1$};
+        \end{tikzpicture}
+        \end{center}
+
+         Demostrar que en este caso se tiene ISI al detectar con la frecuencia $f_s$. Si ahora se transmite la señal $\tilde{x}(t)=\sum_k a_k p(t-k T'_s)$ con el mismo pulso $p(t)$, hallar $T'_s$ para que no haya ISI en la detección. A partir de ahora trabajamos con la señal $\tilde{x}(t)$.
+        \item Hallar y bosquejar la densidad espectral de potencia de onda PAM recibida luego de pasar por el canal.
+        \item ¿Es posible obtener sincronismo a partir de la señal recibida? Si las probabilidades fueran diferentes, ¿es posible que haya forma de sincronizar el detector? 
+        \item Hallar la eficiencia espectral del sistema y compararla con el caso en que el canal fuera ideal ($\hat{H}(f) = 1 \,\, \forall f$) y pudiéramos usar la frecuencia $f_s$ original.
+        \item Sabiendo de antemano que el canal tiene la transferencia de la primera parte y sin modificar la forma de los pulsos, ¿Es posible modificar el receptor de manera que no haya ISI utilizando la frecuencia $f_s$ original? Explicar.
+        \end{enumerate}
+        
+\end{ejercicio}
+
+\begin{ejercicio}
+Sea la onda PAM $x(t)=\sum_k a_k p(t-k T_s)$ con el pulso
+\begin{equation*}
+        p(t) = 2B \left[ \sinc(\pi B t) \right]^2 \cos( \pi B t )       
+\end{equation*}
+
+\begin{enumerate}
+\item Determinar el mínimo valor de $T_s$ en función de $B$ para que no haya ISI. A partir de ahora se utiliza ese valor.
+\item Si $a_k$ puede tomar los valores $0$, $A$ y $2A$ con igual probabilidad e independencia entre un sorteo y otro, hallar y bosquejar la densidad espectral de potencia de onda PAM resultante. ¿Se puede obtener una señal para sincronizar el detector a partir de la onda recibida?
+\item Hallar la potencia de la onda y la energía media del pulso transmitido.
+\item Hallar la eficiencia espectral. Comparar con la que se hubiera obtenido usando pulsos de Nyquist ideales con el mismo ancho de banda.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}
+Sea la onda PAM $x(t)=\sum_k a_k p(t-k T_s)$, con el pulso
+\begin{equation*}
+        p(t) = 3B  \sinc(\pi B t)  \sinc(\alpha\pi B t).        
+\end{equation*}
+Para todas las partes salvo la 5., se utilizará $\alpha=\frac{1}{2}$.
+
+\begin{enumerate}
+\item Para Hallar $P(f)$, y determinar el mínimo valor de $T_s$ en función de $B$ para que no haya ISI. En lo que sigue se utilizara ese valor.
+\item Si $a_k$ puede tomar los valores $-A,A$ en forma independiente y equiprobable, hallar y bosquejar la densidad espectral de potencia de onda PAM resultante. ¿Se puede obtener una señal para sincronizar el detector a partir de la onda recibida? Justificar.
+\item Si ahora $a_k$ toma valores independientes $\{-A,A\}$ pero con probabilidades $1/3$ y $2/3$ respectivamente, cambia la respuesta a la parte 2? Justificar.
+\item Hallar la potencia de la onda, y la energía media del pulso transmitido para las señales de 2 y 3.
+\item Se considera ahora $\alpha>0$ cualquiera. Hallar $P(f)$ y determinar el mínimo valor de $T_s$ en función de $B$ para que no haya ISI. Discutir el tema de la sincronización del detector en este caso.
+\end{enumerate}
+
+\end{ejercicio}
+
+\section{Error en detección sincrónica en presencia de ruido}
+
+\begin{ejercicio}
+Se considera un sistema de trasmisión digital con señalización binaria unipolar $a_k=\{0,A\}$, pulsos rectangulares NRZ, y donde el ruido en el detector es Gaussiano con media nula y varianza $\sigma^2$. Si la probabilidad de error de símbolo es $P_e=1\times 10^{-5}$, calcular la relación $\left(\frac{A}{\sigma}\right)$. Si en cambio se usa señalización polar con igual relación señal/ruido, ¿cuál es la probabilidad de error de símbolo?        
+\end{ejercicio}
+
+\begin{ejercicio}
+Se considera un sistema de transmisión con señalización binaria polar, donde existe interferencia intersimbólica (ISI). Modelamos esta interferencia como una tensión $\pm \alpha A$ que se añade al valor de señal en el instante de muestreo, con $0 < \alpha < 1$. Suponiendo que tanto los símbolos $\pm A$ como los valores de interferencia $\pm \alpha A$ son equiprobables e independientes entre sí, determinar la probabilidad de error de símbolo. En el caso $A=8\sigma$ y $\alpha=0.1$ comparar las probabilidades de error con y sin ISI.
+\end{ejercicio}
+
+\begin{ejercicio}
+Un modelo comúnmente utilizado para el ruido impulsivo en los canales telefónicos, es ruido blanco con función de densidad de Laplace o doble exponencial
+
+\bigskip
+
+\begin{minipage}{0.4\textwidth}
+\begin{equation*}
+f_N(n)= \frac{1}{\sqrt{2\sigma^2}} e^{-\sqrt{2}|n|/\sigma}
+\end{equation*}
+\end{minipage}%
+\begin{minipage}{0.6\textwidth}
+\begin{center}
+\begin{tikzpicture}
+        \begin{axis}[   x=1cm, y=1.5cm, axis lines=middle,  
+                xlabel=$n$,
+                x label style={anchor=north west},
+                y label style={anchor=east},
+                xmin=-3.2,xmax=3.2,ymin=-.2,ymax=1.2,
+                xtick=\empty, ytick=\empty,
+                xticklabels={},
+                clip=false,
+                smooth
+            ]
+        \addplot+[teal, thick,mark=none,domain=0:3] {exp(-x)};
+        \addplot+[teal, thick,mark=none,domain=-3:0] {exp(x)};
+        \end{axis}
+\end{tikzpicture}
+\end{center}
+\end{minipage}
+
+
+\begin{enumerate}
+\item Calcule la probabilidad de error de símbolo en un sistema de trasmisión digital binario que usa pulsos de Nyquist de amplitud $\pm A$, y donde el canal presenta este ruido impulsivo de varianza $\sigma^2$.
+\item Si se desea obtener una probabilidad de error menor a $1\times 10^{-3}$, compare las amplitudes de los pulsos de Nyquist necesarias en cada caso (canal con ruido impulsivo y canal con ruido gaussiano).
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}
+Se recibe una señal $\sum_k a_k p(t-kT_s)$, con símbolos unipolares binarios $a_k
+\in \{0,A\}$, y pulsos triangulares $ p(t)=1 - \frac{|t|}{T_s}$, contaminada con ruido blanco de densidad espectral $\frac{\eta_0}{2}$.
+\begin{enumerate}
+\item Especificar el detector óptimo para esta forma de pulso.
+\item Calcular la probabilidad de error de símbolo en función de los parámetros $A$, $T_s$ y $\eta$.
+\end{enumerate} 
+\end{ejercicio}
+
+\begin{ejercicio}
+Un sistema de comunicación digital binario utiliza un canal con ruido blanco gaussiano de densidad espectral de potencia $\eta/2=10^{-15}$ $V^2/\unit{\Hz}$. La velocidad de señalización es $1\times 10^6$ Baudios, y los pulsos son rectangulares NRZ.
+\begin{enumerate}
+\item Calcular la potencia necesaria para que la probabilidad de error de símbolo $P_e$ sea menor que $1\times 10^{-6}$ si se utiliza señalización unipolar. Recalcular para señalización polar.
+\item ¿Cuál sería la potencia necesaria para mantener la misma velocidad de transmisión de información con igual probabilidad de error $P_e$ usando señalización M-aria, con una constelación de 8 símbolos de amplitudes $\{\pm 1,\pm 3,\pm 5,\pm 7\}$.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}
+Un sistema de transmisión con señalización binaria polar, pulsos de Nyquist ideales, y 50 repetidores debe tener probabilidad de error menor que $10^{-4}$. Calcular la relación $(S/N)$ a la entrada de cada repetidor cuando éstos son regenerativos. Repetir para el caso en que los repetidores sean no-regenerativos.
+\end{ejercicio}
+
+\begin{ejercicio}
+Sea la onda digital $x_T(t)= \sum_k a_k p_N(t-kT_S)$, con símbolos $a_k \in \{ 0, A, 2A\}$ equiprobables, y pulsos de Nyquist $p_N$ de coseno alzado, y exceso de ancho de banda $\alpha=0.8$.
+
+\begin{enumerate}
+\item Calcular la eficiencia espectral de la comunicación en $\unit{bps/\hertz}$.
+\item Si se recibe esta señal contaminada de ruido blanco, diseñar en diagrama de bloques un detector apropiado indicando todos los detalles relevantes. 
+\item Para el detector diseñado, dar una fórmula para la probabilidad de error $P_e$ de símbolo en función de $A$, $f_s$ y la densidad espectral del ruido en el canal $\eta_0$. Evaluar $P_e$ para el caso de densidad espectral de ruido $\eta_0/2=10^{-15} \unit{\square\volt/\hertz}$, amplitud $A=0,6\,\unit{\milli\volt}$, y una velocidad de transmisión de información de 4 \unit{\mega\bit/\sec}.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}
+Se considera una onda PAM de la forma $\sum_k a_kp(t-kT_s)$, con símbolos $a_k\in\{A_1,A_2\}$, $A_1<A_2$, cuyas probabilidades, $P(A_1)$ y $P(A_2)$, no son necesariamente iguales.
+        
+\begin{enumerate}
+\item Demuestre que el umbral óptimo para de detección para ruido Gaussiano es
+\begin{equation*}
+A^{\star} = \frac{A_1+A_2}{2} - \frac{\sigma^2\log\left(\frac{P(A_2)}{P(A_1)}\right)}{A_2-A_1},
+\end{equation*}
+y encuentre una expresión para la probabilidad de error $P_e$.
+
+\item Supongamos que los pulsos $p(t)$ son pulsos de Nyquist de coseno alzado con exceso de ancho de banda 100\%. La señalización es polar con $A=500 \unit{\micro\volt}$ y velocidad $10 \unit{\mega\bit/\sec}$. Además, el canal presenta ruido blanco Gaussiano aditivo con densidad espectral de potencia $\eta_0/2~=~5\times 10^{-16} \,\unit{\volt}^2/\unit{Hz}$.
+
+\begin{enumerate}
+\item Si para la detección digital se utiliza un filtro acoplado, calcule la varianza del ruido a la salida del filtro. ¿Cuál es la desventaja de utilizar este tipo de filtro?
+
+\item Proponga un filtro de recepción alternativo que solucione el inconveniente anterior. Utilizando el umbral óptimo de la parte 1, calcule la probabilidad de error $P_e$, para el caso $P(A_1)=\frac{1}{3}$, $P(A_2)=\frac{2}{3}$,
+
+\end{enumerate}
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}
+
+Se considera un canal digital de banda base contaminado con ruido blanco de densidad espectral $\eta_0/2 = 10^{-5}\,\unit{\square\volt/\hertz}$. Se utiliza señalización polar con símbolos equiprobables de amplitud $A=3.0\,V$ en la recepción, y velocidad de señalización $f_s=10\,\unit{\kilo\baud}$. Se utilizan pulsos triangulares de la forma:
+\begin{equation*}
+        p(t)=\begin{cases}
+                1-\frac{2|t|}{T_s} &\text{ para } |t|\leq \frac{T_s}{2}\\
+                0 & \text{ en otro caso}
+            \end{cases}
+\end{equation*}
+\begin{enumerate}
+\item Determinar la mínima probabilidad de error en la detección, posible del sistema. ¿Cómo se obtiene dicho valor?
+\item La comunicación anterior se repite en 10 tramos
+idénticos, con la amplificación necesaria para restituir el nivel
+de señal. Determinar la probabilidad de error a la salida si los
+amplificadores: 
+\begin{enumerate}
+\item no son regenerativos
+\item son regenerativos
+\end{enumerate}
+\end{enumerate}
+\end{ejercicio}
+
+\section{Modulación digital pasabanda}
+
+\begin{ejercicio}
+Un sistema de señalización binaria BPSK trasmite información a una velocidad de $2.5 \unit{\mega\bit/\second}$. El ruido en el canal es blanco y gaussiano de densidad espectral de potencia $\eta_0/2=10^{-20}\unit{\square\volt/\hertz}$. La amplitud de la señal a la entrada del detector es $A=1\unit{\micro\volt}$. Asumiendo que se trata de detección coherente con filtro acoplado, determinar la probabilidad de error de bit.
+\end{ejercicio}
+
+\begin{ejercicio}
+En la detección BPSK coherente, investigar el efecto de un error de fase $\theta$ entre el oscilador local y la portadora. Hallar la expresión para la probabilidad de error de detección.
+\end{ejercicio}
+
+\begin{ejercicio}
+Considere el sistema QPSK cuya señal transmitida es
+\begin{equation*}
+x_c(t)= \sum_k A p_R(t-kT_s)\cos(2\pi f_c t + \theta_k ),\quad\quad \theta_k\in\left\{0,\frac{\pi}{2},\pi,\frac{3\pi}{2}\right\}.
+\end{equation*}
+Aquí $p_R(t)$ es el pulso rectangular NRZ.
+\begin{enumerate}
+\item Se dispone de dos generadores locales, $\cos(\omega_c t+\pi/4)$ y $\cos(\omega_c t+3\pi/4)$. Diseñar en diagrama de bloques un detector sincrónico
+apropiado usando filtros acoplados.
+\item Para el detector diseñado, calcular la probabilidad de error de símbolo y expresarla en función del parámetro
+$\gamma:=\frac{\overline{E}_p}{\eta}$.
+\end{enumerate}
+\end{ejercicio}
+
+
+\begin{ejercicio}
+Se considera un sistema de transmisión digital pasabanda que utiliza los siguientes $M=8$ pulsos de radio frecuencia 
+\begin{align*} & A p_R(t)[\pm \cos(2\pi f_c t) \pm \sen(2\pi f_c t)],\\ & A p_R(t)[\pm 3\cos(2\pi f_c t)
+\pm \sen(2\pi f_c t)].
+%\[s_3= A p_R(t)[\cos(2\pi f_c t) - \sen(2\pi f_c t)],\]
+%\[s_4= A p_R(t)[3\cos(2\pi f_c t) - \sen(2\pi f_c t)],\]
+%\[s_5=-s_1,\;\; s_6=-s_2, \;\;  s_7=-s_3 \;\;\text{y}\;\; s_8=-s_4.\]
+\end{align*}
+Aquí $p_R(t)$ es el pulso rectangular NRZ. 
+
+\begin{enumerate}
+\item Dibujar un diagrama de la constelaci{ó}n de s{\'\i}mbolos
+utilizada. Mostrar una codificación de Gray para representar 3
+bits mediante esta constelación.
+\item Suponiendo símbolos equiprobables, hallar la densidad
+espectral de potencia de la señal digital correspondiente.
+\item Dise{ñ}ar en diagrama de bloques un detector apropiado para este sistema.
+\item Si el canal presenta ruido blanco gaussiano de densidad espectral de
+potencia $\eta/2$, hallar una fórmula para la probabilidad $P_e$
+de error de símbolo para el sistema, en función de
+$\gamma:=\frac{\bar{E}_p}{\eta}$, siendo $\bar{E}_p$ la energía
+media de los pulsos.
+\item Evaluar numéricamente la curva $P_e(\gamma)$ de (d), y comparar con
+la correspondiente a modulación 8PSK. ?`Cuál es mejor?
+\item Comparar también con la curva para una transmisión de banda
+base polar, con $M=8$ símbolos. ?`Es justa esta comparación en
+términos de eficiencia espectral?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}
+En los sistemas coherentes donde se debe enviar una pequeña señal piloto para la sincronización, empeora la eficiencia. Considere un sistema digital BPSK, cuya onda trasmitida es
+\begin{equation*}
+        x_c(t) = \sum_k a_k\sqrt{1-\mu^2}p_R(t-kT_s)\cos(\omega_c t)+\mu
+        A\sin(\omega_c t),
+\end{equation*}
+donde $a_k=\{+A,-A\}$, $0<\mu<1$, y $p_R(t)$ es el pulso rectangular NRZ de largo $T_s$. Calcule la probabilidad de error de símbolo en función de la densidad espectral de potencia del ruido $\frac{\eta}{2}$ y la potencia media trasmitida. Compare el resultado con el que se obtendría si no se enviara la portadora piloto $s_c(t)=\mu A\sin(\omega_c t)$.
+\end{ejercicio}
+
+\begin{ejercicio}
+El sistema de la figura es un detector diferencial no coherente para
+señales BPSK.
+
+\begin{center}
+\begin{tikzpicture}
+        [node distance=2cm,>=stealth, auto,
+         block/.style={rectangle, minimum size=1cm,draw,thick},
+         operator/.style={circle,draw, minimum size=5mm, inner sep=0mm, thick},
+         gain/.style={isosceles triangle,draw,isosceles triangle apex angle=60,thick}]
+\node[name=input, coordinate] at (0,0) {};
+\node[block, name=filtror, right of=input] {$\hat{H}(f)$};
+\node[name=split,right of=filtror, xshift=-1cm, coordinate] {};
+
+\node[block, name=delay, below right of=split] {Retardo $T_s$};
+\node[gain, name=amp, right of=delay] {$2$};
+\node[operator, name=mult, above right of=amp] {$\times$};
+\node[block, name=int, right of=mult] {$\frac{1}{T_s}\int_{t-T_s}^t $};
+\node[coordinate, name=sampler, right of=int] {};
+\node[block, name=comp, right of=sampler] {Comp. $\pm$};
+
+\draw[thick,->] (int.east)  -- ($(sampler) + (-.3,0)$) -- ($ (sampler) + (.3,.5) $) node[left, xshift=-5] {$t_k$};
+\draw[thick,->] ($ (sampler) + (0.3,0) $) -- (comp.west);
+
+\node[name=output, right of=comp] {$m_k$};
+
+\draw[thick,->] (input)--(filtror);
+\draw[thick,->] (filtror) -- (split) |- (delay.west);
+\draw[thick,->] (delay.east) |- (amp.west);
+\draw[thick,->] (amp.east) -| (mult.south);
+\draw[thick,->] (split) -- (mult.west) node[midway] {$x_c(t)+n(t)$}; 
+\draw[thick,->] (mult.east) -- (int.west);
+\draw[thick,->] (comp.east) -- (output);
+
+\end{tikzpicture}
+
+\end{center}
+
+\begin{enumerate}
+\item Sea la onda BPSK $x_c(t) = \sum_k A p(t-kT_s)\cos(\omega_c t+a_k\pi),$
+con $a_k\in\{0,1\}$, pulsos rectangulares NRZ,  y $\omega_c$
+m\'ultiplo de $\omega_s$. Ignoramos por el momento el ruido. Sea $z_k$ el valor de la muestra en $t_k=(k+1)T_s$; el comparador da $m_k =1$ si $z_k>0$, y $m_k=0$ en otro caso. Expresar $m_k$ en función de $a_k$ y $a_{k-1}$.
+
+\item Supongamos que se detecta la secuencia $m_1, m_2, \ldots, m_8 = 11000110$. Asumiendo que $a_0=1$, determinar cuál fue el mensaje $a_1, a_2, \ldots, a_8$ transmitido.
+
+\item Consideramos ahora el ruido Gaussiano. Mediante un estudio que no se hará aquí, se puede obterner la fórmula
+de probabilidad de error $ P_e = \frac{1}{2}\exp\left(-\frac{\bar{E}_p}{\eta}\right)$, donde $\bar{E}_p$ es la energía media del pulso transmitido, y
+$\frac{\eta}{2}$ la densidad espectral de potencia del ruido blanco del canal. Tomando valores para $P_e = 10^{-i}, \ i=2,\ldots,10$, hacer una gráfica que compare los requerimientos de $\bar{E}_p/{\eta}$ con el caso del detector BPSK coherente. ¿Cuál es más eficiente?
+
+\item Evaluar la potencia media requerida en el detector de arriba para una transmisión binaria de 100kbps y  un nivel de ruido $\frac{\eta}{2}=10^{-12}\text{V}^2/\text{Hz}$, si se desea $P_e=10^{-3}$.
+\end{enumerate}
+
+\end{ejercicio}
+
+\begin{ejercicio}
+Un broadcaster tiene un flujo de video de 30 Mbps que se desea transportar via satélite. Se decide utilizar modulación 4-QAM con pulsos de Nyquist de coseno elevado con exceso de ancho de banda $\alpha=0.2$.
+\begin{enumerate}
+\item Indicar el ancho de banda $B$ necesario en el canal pasabanda para este transporte.
+\item Bosquejar la densidad espectral de potencia de la señal modulada.
+\item Proponer un detector coherente para estos pulsos que no introduzca ISI, y deducir la fórmula para la probabilidad de error de detección en base a los parámetros de modulación, en particular la amplitud $A$ de los pulsos recibidos y la densidad espectral de potencia del ruido blanco en el canal. Evaluar para el caso $A=3V$ y $\frac{\eta}{2} = 10^{-4}\unit{\square\volt/\hertz}$.
+\item Luego de realizados los cálculos, el proveedor de espacio satelital avisa que no podr'a ofrecer el ancho de banda $B$, pero si se podrá ofrecer dos espacios de ancho de banda $\frac{B}{2}$. ¿Es posible transmitir los 30 Mbps entre esos dos canales mediante modulación 4QAM en c/u, con el mismo rolloff en
+los pulsos de Nyquist? Si es así indicar cómo hacerlo.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}
+Sea un sistema de transmisión digital pasabanda, en donde envía la señal con envolvente compleja
+\begin{equation*}
+x_{ce}(t)=\sum z_k p_{[0,T_s]}(t),
+\end{equation*}
+en donde los símbolos complejos $z_k$ son independientes y equiprobables. Se utiliza la siguiente constelación de símbolos
+
+\begin{figure}[h!]
+        \centering
+\begin{tikzpicture}[scale=1]
+                \draw [->] (-3,0) -- (3,0) node [anchor=north] {$I$};
+                \draw [->] (0,-3) -- (0,3) node [anchor=west] {$Q$};
+                \draw [teal,fill] (2,2) circle (0.14);
+                \draw [teal,fill] (-2,2) circle (0.14);
+                \draw [teal,fill] (2,-2) circle (0.14);
+                \draw [teal,fill] (-2,-2) circle (0.14);
+                \draw [teal,fill] (-1,2) circle (0.14);
+                \draw [teal,fill] (1,-2) circle (0.14);
+                \draw [teal,fill] (1,2) circle (0.14);
+                \draw [teal,fill] (-1,-2) circle (0.14);
+                \draw [teal,fill] (-2,1) circle (0.14);
+                \draw [teal,fill] (2,-1) circle (0.14);
+                \draw [teal,fill] (-2,-1) circle (0.14);
+                \draw [teal,fill] (2,1) circle (0.14);
+                \draw [teal,fill] (-1,1) circle (0.14);
+                \draw [teal,fill] (1,-1) circle (0.14);
+                \draw [teal,fill] (-1,-1) circle (0.14);
+                \draw [teal,fill] (1,1) circle (0.14);
+%      \node at(3,3) {16-QAM};
+                \foreach \x/\y in {-2,-1/-,1/{},2}
+                        {\draw [fill] (\x,0)  node [anchor=north] {\y$A$};
+                \draw [fill] (0,\x)  node [anchor=east] {\y$A$};}
+%
+\end{tikzpicture}
+\end{figure}
+
+\begin{enumerate}
+\item Buscar una codificación de Gray adecuada para el diagrama, hallar $S_z(\varphi)$ y la energía por bit $\bar{E_b}$ .
+\item Diseñar un diagrama de bloques de un demodulador especificando los umbrales y los filtros utilizados.
+\item Expresar la probabilidad de error en función de A y $\sigma$ para $a_k$ y $b_k $ y dar una aproximación para el error de símbolo. Suponer que se tiene ruido blanco Gaussiano aditivo con varianza $\sigma^2$.
+\item Para $A=6$ y $\sigma=1$, evaluar la probabilidad de error de símbolo y compararla con la probabilidad que se obtiene si se desprecian los errores que se escapan del cuadrante del símbolo.
+\item Expresar la probabilidad anterior en función de $\bar{E_p}$ y $\eta$, donde $\frac{\eta}{2}$ es la densidad espectral del ruido.
+\item Suponiendo que $a_k$ y $b_k$ tienen sus valores en $(2A,\alpha A, -\alpha A, 2A)$, hallar el alfa que hace óptimo la probabilidad de error de símbolo, especificando cual es esta probabilidad.
+\end{enumerate}
+\end{ejercicio}
+
+\end{document}
