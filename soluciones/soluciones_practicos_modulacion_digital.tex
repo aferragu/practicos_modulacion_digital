@@ -255,7 +255,7 @@ Una computadora genera palabras de 16 bits a una velocidad de 20.000 palabras po
         \begin{equation*}
                  \mathrm{vti} = \log_2(M) f_s \Rightarrow M = 2^{\frac{320}{120}} \approx 6.35 \mapsto 7 \textrm{ bits}
         \end{equation*}
-        En la práctica usaríamos $8=2^3$ y un ancho de banda algo menor.
+        En la práctica usaríamos $8=2^3$ y un ancho de banda algo menor ($\approx 53 \unit{\kilo\hertz}$).
 \end{solucion}
 
 \begin{ejercicio}
@@ -267,7 +267,16 @@ Una computadora genera palabras de 16 bits a una velocidad de 20.000 palabras po
 \end{ejercicio}
 
 \begin{solucion}
-        
+
+        \begin{enumerate}
+        \item $\textrm{vti} = 56 \textrm{ kbps}$, señalización binaria por lo que $f_s=\textrm{vti} = 56 \unit{\kilo\hertz}$. Para pulsos de Nyquist con exceso $\alpha$ vale:
+        \begin{equation*}
+                \frac{f_s}{2}(1+\alpha) = B
+        \end{equation*}
+        De donde los anchos de banda son $28 \unit{\kilo\hertz}$, $35 \unit{\kilo\hertz}$, $42 \unit{\kilo\hertz}$ y $56 \unit{\kilo\hertz}$ respectivamente.
+
+        \item Si el canal es de $30 \unit{\kilo\hertz}$, las posibles frecuencias de símbolo son $f_s = \frac{2B}{1+\alpha}$, es decir $f_s = 60 \textrm{ kbaud}$, $48 \textrm{ kbaud}$, $40 \textrm{ kbaud}$ y $30 \textrm{ kbaud}$ respectivamente. Los $M$ necesarios son $2^{\frac{\textrm{vti}}{f_s}}$ lo que da $M=2$ para $\alpha=0$, $M=3$ para los intermedios y $M=4$ para $\alpha=1$ (redondeando al entero más cercano).
+        \end{enumerate}
 \end{solucion}
 
 \begin{ejercicio}
@@ -319,6 +328,81 @@ espectral de potencia de la señal $x(t)$.
 calcule la relación entre la velocidad de trasmisión de información y el ancho de banda del canal de trasmisión.
 \end{enumerate}
 \end{ejercicio}
+
+\begin{solucion}
+\begin{enumerate}
+
+        \item La convolución de estos pulsos, al ser $0<\alpha<1$ produce el siguiente trapecio:
+
+        \begin{center}
+                \begin{tikzpicture}
+                        \begin{axis}[   x=5cm, y=1.5cm, axis lines=middle,  
+                                xlabel=$f$,
+                                x label style={anchor=north},
+                                y label style={anchor=east},
+                                xmin=-1.2,xmax=1.2,ymin=-.2,ymax=2,
+                                xtick={-1,-.85,-.7,0,.7,.85,1}, ytick=\empty,
+                                xticklabels={$\scriptstyle -\frac{1+\alpha}{2T_s}$, $\scriptstyle -\frac{1}{2T_s}$, $\scriptstyle -\frac{1-\alpha}{2T_s}$, 0 , $\scriptstyle \frac{1-\alpha}{2T_s}$, $\scriptstyle \frac{1}{2T_s}$, $\scriptstyle \frac{1+\alpha}{2T_s}$},
+                                clip=false,
+                            ]
+                        \addplot[thick,mark=none, teal] coordinates
+                        {(-1.2,0) (-1,0) (-.7,1) (.7,1) (1,0) (1.2,0)} node[above left,midway]{$T_s$};
+                        \node at (axis cs:-.8,1.5) {$\hat{p}(f)$};
+                        \end{axis}
+                \end{tikzpicture}                        
+        \end{center}
+
+        \item Podemos hacerlo de dos maneras:
+         \begin{itemize}
+          \item En frecuencia, ver que tiene simetría vestigial alrededor de $1/(2T_s)$ por lo que usando $f_s= 1/T_s$ no debería introducir ISI. $p(0)$ es el área bajo la gráfica de $\hat{p}(f)$, $p(0)=1$.
+          \item En el tiempo, observando que la antitransformada del pulso es el producto de dos $\sinc$:
+           \begin{equation*}
+                p(t) = \sinc(\pi f_s t)\sinc(\pi \alpha f_s t).
+           \end{equation*}
+           De aquí se deduce que $p(0)=1$ y que, por el primer término, no hay ISI a frecuencia $f_s=1/T_s$.
+         \end{itemize}
+
+        \item Observemos que $\mu=0$ y $\sigma^2 = E[a_k^2] = (-3A)^2(1/4) + (-A)^2(1/4) + A^2 (1/4) + (3A)^2 (1/4) = 5A^2$. Por lo tanto el espectro es solo continuo según la fórmula:
+         \begin{equation*}
+                S_x(f) = \sigma^2 f_s |\hat{p}(f)|^2.
+         \end{equation*}
+         Se obtiene por lo tanto:
+         \begin{equation*}
+                S_x(f) = \begin{cases}
+                5A^2 T_s^3 \left(f+\frac{1+\alpha}{2T_s}\right)^2 \frac{1}{\alpha^2} & -\frac{1+\alpha}{2T_s} \leqslant f \leqslant -\frac{1-\alpha}{2T_s} \\
+                5A^2 T_s & -\frac{1-\alpha}{2T_s} \leqslant f \leqslant \frac{1-\alpha}{2T_s} \\
+                5A^2 T_s^3 \left(f-\frac{1+\alpha}{2T_s}\right)^2 \frac{1}{\alpha^2}& \frac{1-\alpha}{2T_s} \leqslant f \leqslant \frac{1+\alpha}{2T_s} \\
+                0 & \textrm{fuera de la banda}.
+                \end{cases}
+         \end{equation*}
+         Para hallar las regiones laterales se elevó al cuadrado la ecuación de la recta del trapecio correspondiente.
+
+         Bosquejo:
+         \begin{center}
+                \begin{tikzpicture}
+                        \begin{axis}[   x=5cm, y=1.5cm, axis lines=middle,  
+                                xlabel=$f$,
+                                ylabel=$S_x(f)$,
+                                x label style={anchor=north},
+                                y label style={anchor=east},
+                                xmin=-1.2,xmax=1.2,ymin=-.2,ymax=2,
+                                xtick={-1,-.85,-.7,0,.7,.85,1}, ytick=\empty,
+                                xticklabels={$\scriptstyle -\frac{1+\alpha}{2T_s}$, $\scriptstyle -\frac{1}{2T_s}$, $\scriptstyle -\frac{1-\alpha}{2T_s}$, 0 , $\scriptstyle \frac{1-\alpha}{2T_s}$, $\scriptstyle \frac{1}{2T_s}$, $\scriptstyle \frac{1+\alpha}{2T_s}$},
+                                clip=false,
+                            ]
+                        \addplot+[thick,mark=none, const plot, teal, domain=(-.7:.7)] {1} node[above left,midway]{$5A^2T_s$};
+                        \addplot+[thick,mark=none, teal, domain=(-1:-.7)] {(x+1)^2/.09};
+                        \addplot+[thick,mark=none, teal, domain=(.7:1)] {(1-x)^2/.09};
+                        \end{axis}
+                \end{tikzpicture}                        
+        \end{center}
+
+        \item Si $\alpha = 2/3$, el ancho de banda para que el pulso pase entero sin distorsión (e introduzca ISI a la salida) es $B = \frac{(1+2/3)}{2T_s} = \frac{5}{6T_s} = \frac{5}{6}f_s$. La velocidad de transmisión de información es $\textrm{vti} = \log_2{4} f_s = 2 f_s$, de donde la eficiencia espectral es:
+        \begin{equation*}
+                \textrm{Eff} = \frac{\textrm{vti}}{B} = \frac{2 f_s}{(5/6) f_s} = 2.4 \unit{\bit/\hertz}
+        \end{equation*}
+\end{enumerate}
+\end{solucion}
 
 \begin{ejercicio}
 Se considera el pulso de duración $T$, dado en $|t|\leqslant \frac{T}{2}$ por $ p(t)=1 - \frac{2 |t|}{T}$.  Se utiliza este pulso para una transmisión digital $\sum_k a_k p(t-kT_s)$, con símbolos unipolares binarios $a_k \in \{0,A\}$.
