@@ -345,7 +345,7 @@ calcule la relación entre la velocidad de trasmisión de información y el anch
                                 xticklabels={$\scriptstyle -\frac{1+\alpha}{2T_s}$, $\scriptstyle -\frac{1}{2T_s}$, $\scriptstyle -\frac{1-\alpha}{2T_s}$, 0 , $\scriptstyle \frac{1-\alpha}{2T_s}$, $\scriptstyle \frac{1}{2T_s}$, $\scriptstyle \frac{1+\alpha}{2T_s}$},
                                 clip=false,
                             ]
-                        \addplot[thick,mark=none, teal] coordinates
+                        \addplot[very thick,mark=none, teal] coordinates
                         {(-1.2,0) (-1,0) (-.7,1) (.7,1) (1,0) (1.2,0)} node[above left,midway]{$T_s$};
                         \node at (axis cs:-.8,1.5) {$\hat{p}(f)$};
                         \end{axis}
@@ -390,7 +390,7 @@ calcule la relación entre la velocidad de trasmisión de información y el anch
                                 xticklabels={$\scriptstyle -\frac{1+\alpha}{2T_s}$, $\scriptstyle -\frac{1}{2T_s}$, $\scriptstyle -\frac{1-\alpha}{2T_s}$, 0 , $\scriptstyle \frac{1-\alpha}{2T_s}$, $\scriptstyle \frac{1}{2T_s}$, $\scriptstyle \frac{1+\alpha}{2T_s}$},
                                 clip=false,
                             ]
-                        \addplot+[thick,mark=none, const plot, teal, domain=(-.7:.7)] {1} node[above left,midway]{$5A^2T_s$};
+                        \addplot+[very thick,mark=none, const plot, teal, domain=(-.7:.7)] {1} node[above left,midway]{$5A^2T_s$};
                         \addplot+[thick,mark=none, teal, domain=(-1:-.7)] {(x+1)^2/.09};
                         \addplot+[thick,mark=none, teal, domain=(.7:1)] {(1-x)^2/.09};
                         \end{axis}
@@ -779,8 +779,15 @@ Sea la onda PAM $x(t)=\sum_k a_k p(t-k T_s)$ con el pulso
         \begin{equation*}
                 \bar{E}_p = (5/3)A^2 [(1/3)B + B + (1/3)B] = \frac{25}{9}A^2B
         \end{equation*}
+
+        \item $\mathrm{vti} = f_s \log_2(M) = 2B \log_2(3)$. Ancho de banda $3B/2$, de donde la eficiencia es:
+        \begin{equation*}
+                \textrm{Eff} = \frac{2B\log_2(3)}{(3/2)B} = \frac{4}{3}\log_2(3) \approx 2.11 \unit{\bit/\hertz} < 3.17 \approx 2\log_2(3),
+        \end{equation*}
+        que es la eficiencia del pulso ideal en este caso.
         \end{enumerate}
 \end{solucion}
+
 \begin{ejercicio}
 Sea la onda PAM $x(t)=\sum_k a_k p(t-k T_s)$, con el pulso
 \begin{equation*}
@@ -789,7 +796,7 @@ Sea la onda PAM $x(t)=\sum_k a_k p(t-k T_s)$, con el pulso
 Para todas las partes salvo la 5., se utilizará $\alpha=\frac{1}{2}$.
 
 \begin{enumerate}
-\item Para Hallar $P(f)$, y determinar el mínimo valor de $T_s$ en función de $B$ para que no haya ISI. En lo que sigue se utilizara ese valor.
+\item Hallar $P(f)$, y determinar el mínimo valor de $T_s$ en función de $B$ para que no haya ISI. En lo que sigue se utilizara ese valor.
 \item Si $a_k$ puede tomar los valores $-A,A$ en forma independiente y equiprobable, hallar y bosquejar la densidad espectral de potencia de onda PAM resultante. ¿Se puede obtener una señal para sincronizar el detector a partir de la onda recibida? Justificar.
 \item Si ahora $a_k$ toma valores independientes $\{-A,A\}$ pero con probabilidades $1/3$ y $2/3$ respectivamente, cambia la respuesta a la parte 2? Justificar.
 \item Hallar la potencia de la onda, y la energía media del pulso transmitido para las señales de 2 y 3.
@@ -798,15 +805,114 @@ Para todas las partes salvo la 5., se utilizará $\alpha=\frac{1}{2}$.
 
 \end{ejercicio}
 
+\begin{solucion}
+Graficamos primero el pulso, para $\alpha=1/2$:
+\begin{center}
+        \begin{tikzpicture}
+                \pgfmathdeclarefunction{sinc}{1}{%
+                \pgfmathparse{(#1==0 ? 1: sin(#1 r))/(#1==0 ? 1: #1)}%
+                }
+                \begin{axis}[   x=1.8cm, y=1cm, axis lines=middle,  
+                        xlabel=$f$,
+                        ylabel=$p(t)$,
+                        x label style={anchor=north},
+                        y label style={anchor=east},
+                        xmin=-3.5,xmax=3.5,ymin=-.2,ymax=3.5,
+                        xtick={-3,-2,-1,0,1,2,3}, ytick=\empty,
+                        xticklabels={$-\frac{3}{B}$,$-\frac{2}{B}$, $-\frac{1}{B}$,$0$,$\frac{1}{B}$,$\frac{2}{B}$,$\frac{3}{B}$},
+                        clip=false,
+                    ]
+                \addplot+ [mark=none, solid,very thick, teal, domain=(-3.5:3.5), samples=100] {3*sinc(pi*x)*sinc(pi*x/2)} node[midway,above right] {$3B$};
+                \end{axis}
+        \end{tikzpicture}
+\end{center}
+
+\begin{enumerate}
+\item Para hallar $\hat{P}(f)$, conviene escribir $p(t) = \frac{3}{\alpha B} [B\sinc(\pi B t)][\alpha B \sinc(\alpha\pi B t)]$. De este modo, en frecuencia es la convolución de dos pulsos de anchos $B$ y $\alpha B$ (similar al Ej. 1.5) y alto $1$. Esto da el siguiente trapecio (para $\alpha=1/2$):
+\begin{center}
+        \begin{tikzpicture}
+                \begin{axis}[   x=1.8cm, y=1.5cm, axis lines=middle,  
+                        xlabel=$f$, ylabel=$\hat{P}(f)$,
+                        x label style={anchor=north},
+                        y label style={anchor=east},
+                        xmin=-3.5,xmax=3.5,ymin=-.2,ymax=1.4,
+                        xtick={-3,-2,-1,0,1,2,3}, ytick=\empty,
+                        xticklabels={$-\frac{3}{4}B$, $-\frac{1}{2}B$, $-\frac{1}{4}B$, $0$, $\frac{1}{4}B$, $\frac{1}{2}B$, $\frac{3}{4}B$},
+                        clip=false,
+                    ]
+                \addplot[very thick,mark=none, teal] coordinates
+                {(-3.5,0) (-3,0) (-1,1) (0,1) (1,1) (3,0) (3.5,0)} node[above right,midway]{$3$};
+                \end{axis}
+        \end{tikzpicture}                        
+\end{center}
+Notar que el área bajo el trapecio es $3B = p(0)$ como verificación. El pulso en frecuencia tiene simetría vestigial alrededor de $(1/2)B$ por lo que podemos tomar $f_s/2 = (1/2)B$ o bien $f_s=B$.
+
+\item En este caso $\mu=0$ y $\sigma^2 = E[a_k^2]= A^2$. La onda recibida tendrá solo densidad continua en frecuencia, sin deltas.
+
+Bosquejo:
+         \begin{center}
+                \begin{tikzpicture}
+                        \begin{axis}[x=1.8cm, y=1.5cm, axis lines=middle,  
+                                xlabel=$f$,
+                                ylabel=$S_x(f)$,
+                                x label style={anchor=north},
+                                y label style={anchor=east},
+                                xmin=-3.5,xmax=3.5,ymin=-.2,ymax=1.5,
+                                xtick={-3,-2,-1,0,1,2,3}, ytick=\empty,
+                                xticklabels={$-3B/4$, $-B/2$, $-B/4$,$0$,$B/4$,$B/2$, $3B/4$},
+                                clip=false,
+                            ]
+                        \addplot+[very thick,mark=none, const plot, teal, domain=(-1:1)] {1} node[above right,midway]{$9A^2 B$};
+                        \addplot+[very thick,mark=none, teal, domain=(-3:-1)] {(x+3)^2/4};
+                        \addplot+[very thick,mark=none, teal, domain=(1:3)] {(3-x)^2/4};
+                        \end{axis}
+                \end{tikzpicture}              
+        \end{center}
+
+
+\item Si cambian las probabilidades, aparecerá una $\delta$ en continua, de valor $\mu^2 B^2$, pero no armónicos ya que el espectro del pulso termina antes de $f_s=B$. En este caso $\mu^2 = A^2/9$.
+
+\item Para el caso $\mu=0$, hay que integrar la $S_x(f)$ resultando en:
+ \begin{equation*}
+        S = 9A^2 B \left[\frac{B}{6} + \frac{B}{2} + \frac{B}{6} \right] = \frac{15}{2}A^2 B^2
+ \end{equation*}
+
+ Si además hay continua, hay que sumar la $\delta$, obteniendo $S=\frac{15}{2}A^2 B^2 + \frac{1}{9}A^2B^2$.
+
+ La energía media del pulso transmitido surge de $\bar{E}_p = E[a_k^2]||p||^2$. Integrando en frecuencia, $||p||^2 = 9\left[\frac{B}{6} + \frac{B}{2} + \frac{B}{6} \right] = \frac{15}{2}B$, de donde $\bar{E}_p = \frac{15}{2}A^2B$. Como $E[a_k^2]$ no depende de las probabilidades, la energía media del pulso es la misma en ambos casos.
+
+ \item Si ahora $\alpha>0$ cualquiera, tendremos un trapecio como el anterior si $0<\alpha<1$. Para $\alpha=1$ queda un triángulo de ancho $2B$ y podemos seguir usando $f_s=B$ para tener simetría vestigial. Si ahora $\alpha>1$, el pulso ``lento'' es el que tiene ancho $B$ (ocupa menos ancho de banda) y el espectro vuelve a ser un trapecio de altura $3/\alpha$ ahora, y con simetría vestigial en $f_s/2 = \alpha B/2$, es decir que podemos aumentar la frecuencia de señalización a $f_s=\alpha B$ (correspondiente a las raíces del segundo $\sinc$) a cambio de mayor ancho de banda. De todos modos, el espectro siempre está contenido dentro de $\pm f_s$ por lo que en caso de haber continua no habrá armónicos.
+\end{enumerate}
+
+\end{solucion}
+
 \section{Error en detección sincrónica en presencia de ruido}
 
 \begin{ejercicio}
 Se considera un sistema de trasmisión digital con señalización binaria unipolar $a_k=\{0,A\}$, pulsos rectangulares NRZ, y donde el ruido en el detector es Gaussiano con media nula y varianza $\sigma^2$. Si la probabilidad de error de símbolo es $P_e=1\times 10^{-5}$, calcular la relación $\left(\frac{A}{\sigma}\right)$. Si en cambio se usa señalización polar con igual relación señal/ruido, ¿cuál es la probabilidad de error de símbolo?        
 \end{ejercicio}
 
+\begin{solucion}
+Si se usa señalización polar, el umbral es $A/2$ y necesitamos $Q(A/(2\sigma)) = 10^{-5}$. De la gráfica, $A/(2\sigma) = 4.26$ o bien $A/\sigma = 8.52$. Para señalización polar, con este $A/\sigma$, el umbral es $0$ y la prob. de error es $Q(A/\sigma) = Q(8.52) \approx 7.3\times 10^{-18}$.
+\end{solucion}
+
+
 \begin{ejercicio}
 Se considera un sistema de transmisión con señalización binaria polar, donde existe interferencia intersimbólica (ISI). Modelamos esta interferencia como una tensión $\pm \alpha A$ que se añade al valor de señal en el instante de muestreo, con $0 < \alpha < 1$. Suponiendo que tanto los símbolos $\pm A$ como los valores de interferencia $\pm \alpha A$ son equiprobables e independientes entre sí, determinar la probabilidad de error de símbolo. En el caso $A=8\sigma$ y $\alpha=0.1$ comparar las probabilidades de error con y sin ISI.
 \end{ejercicio}
+
+\begin{solucion}
+        Notemos que los símbolos posibles a recibir van a ser $\{-(1+\alpha)A, -(1-\alpha)A, (1-\alpha)A, (1+\alpha)A\}$, todos con igual probabilidad (todas las combinaciones de símbolo e ISI modelada). Al detectar tendremos un ruido Gaussiano de potencia $\sigma^2$. Colocamos el umbral el $0$ por simetría y la probabilidad de error queda:
+        \begin{equation*}
+                P_e = \frac{Q((1-\alpha)(A/\sigma))+Q((1+\alpha)(A/\sigma))}{2}
+        \end{equation*}
+
+        Para $A/\sigma=8$ y $\alpha=0.1$ queda:
+        \begin{equation*}
+                P_e = \frac{Q(7.2)+Q(8.8)}{2} \approx 1.5\times 10^{-13}.
+        \end{equation*}
+        Para $\alpha=0$ (sin ISI), queda $Q(8)= 6\times 10^{-16}$. La ISI aumenta mucho la probabilidad de error, de hecho, la mitad del tiempo estamos trabajando con un un $A$ efectivo de $(1-\alpha)A$ y en general $Q((1+\alpha)(A/\sigma)) \ll Q((1-\alpha)(A/\sigma))$ por lo que $P_e \approx Q((1-\alpha)(A/\sigma))/2$.
+\end{solucion}
 
 \begin{ejercicio}
 Un modelo comúnmente utilizado para el ruido impulsivo en los canales telefónicos, es ruido blanco con función de densidad de Laplace o doble exponencial
@@ -845,6 +951,54 @@ f_N(n)= \frac{1}{\sqrt{2\sigma^2}} e^{-\sqrt{2}|n|/\sigma}
 \end{enumerate}
 \end{ejercicio}
 
+\begin{solucion}
+\begin{enumerate}
+\item El usar pulsos de Nyquist aquí no es más para indicar que son de ancho de banda acotado y no hay ISI, por lo que el único error se debe al ruido. Si transmito $A$, al perturbar por el ruido la densidad del valor recibido es:
+\item 
+        \begin{minipage}{0.4\textwidth}
+        \begin{equation*}
+        f_x(x\mid A)= \frac{1}{\sqrt{2\sigma^2}} e^{-\sqrt{2}|x-A|/\sigma}
+        \end{equation*}
+        \end{minipage}%
+        \begin{minipage}{0.6\textwidth}
+        \begin{center}
+        \begin{tikzpicture}
+                \begin{axis}[   x=1cm, y=1.5cm, axis lines=middle,  
+                        xlabel=$n$,
+                        x label style={anchor=north west},
+                        y label style={anchor=east},
+                        xmin=-3.2,xmax=3.2,ymin=-.2,ymax=1.2,
+                        xtick={1}, ytick=\empty,
+                        xticklabels={$A$},
+                        clip=false,
+                        smooth
+                    ]
+                \addplot+[teal, thick,mark=none,domain=1:3] {exp(-(x-1))};
+                \addplot+[teal, thick,mark=none,domain=-3:1] {exp(x-1)};
+                \end{axis}
+        \end{tikzpicture}
+        \end{center}
+        \end{minipage}
+Integrando:
+\begin{equation*}
+        P(x<0\mid A) = \int_{-\infty}^0 \frac{1}{\sqrt{2\sigma^2}} e^{-\sqrt{2}|x-A|/\sigma} dx = \frac{1}{\sqrt{2\sigma^2}} \int_{-\infty}^0 e^{-\frac{\sqrt{2}}{\sigma} (A-x)}dx = \frac{1}{2} e^{-\sqrt{2}\frac{A}{\sigma}}.
+\end{equation*} 
+Por simetría $P(x>0\mid -A)$ es igual, y por lo tanto la probabilidad de error es:
+\begin{equation*}
+        P_e = \frac{1}{2}P(x<0\mid A)+ \frac{1}{2}P(x>0\mid -A) = \frac{1}{2} e^{-\sqrt{2}\frac{A}{\sigma}}.
+\end{equation*}
+
+\item Para ruido impulsivo igualamos:
+\begin{equation*}
+        \frac{1}{2} e^{-\sqrt{2}\frac{A}{\sigma}} = 10^{-3} \Rightarrow \frac{A}{\sigma} \approx 4.4.
+\end{equation*}
+Comparando, para ruido Gaussiano necesitamos $Q(A/\sigma) = 10^{-3}$ de donde $A/\sigma = 3.1$.
+
+\end{enumerate}
+
+\end{solucion}
+
+
 \begin{ejercicio}
 Se recibe una señal $\sum_k a_k p(t-kT_s)$, con símbolos unipolares binarios $a_k
 \in \{0,A\}$, y pulsos triangulares $ p(t)=1 - \frac{|t|}{T_s}$, contaminada con ruido blanco de densidad espectral $\frac{\eta_0}{2}$.
@@ -854,6 +1008,52 @@ Se recibe una señal $\sum_k a_k p(t-kT_s)$, con símbolos unipolares binarios $
 \end{enumerate} 
 \end{ejercicio}
 
+\begin{solucion}
+        Al ser un pulso triangular, el filtro acoplado correspondiente (causal) es otro triángulo $h(t) = 1-\frac{|t-T_s|}{T_s}$ entre $0$ y $2T_s$, y muestrear con $\tau=T_s$ de retardo. Podemos además calcular $||p||^2$ integrando en el tiempo para obtener $||p||^2 = \frac{2}{3}T_s$ y ajustar la ganancia $\kappa=1/||p||^2 = \frac{3}{2T_s}$ para recuperar el símbolo exacto a la salida.
+        \begin{center}
+                \begin{tikzpicture}
+                        \begin{axis}[   x=3cm, y=1.5cm, axis lines=middle,  
+                                xlabel=$t$,
+                                ylabel=$p(t)$,
+                                x label style={anchor=north},
+                                y label style={anchor=east},
+                                xmin=-1.2,xmax=1.2,ymin=-.2,ymax=1.4,
+                                xtick={-.3,0,.3}, ytick={1},
+                                xticklabels={$-T_s$, 0 , $T_s$},
+                                clip=false,
+                            ]
+                        \addplot+[very thick,mark=none, teal] coordinates {(-1,0) (-.3,0) (0,1) (.3,0) (1,0)};
+                        \end{axis}
+                \end{tikzpicture} \hspace{1em}
+                \begin{tikzpicture}
+                        \begin{axis}[   x=3cm, y=1.5cm, axis lines=middle,  
+                                xlabel=$t$,
+                                ylabel=$h(t)$,
+                                x label style={anchor=north},
+                                y label style={anchor=east},
+                                xmin=-1.2,xmax=1.2,ymin=-.2,ymax=1.4,
+                                xtick={0,.3,.6}, ytick={1},
+                                xticklabels={0, $T_s$, $2T_s$}, yticklabels = {$\frac{3}{2T_s}$},
+                                clip=false,
+                            ]
+                        \addplot+[very thick,mark=none, teal] coordinates {(-1,0) (0,0) (0.3,1) (.6,0) (1,0)};
+                        \end{axis}
+                \end{tikzpicture}      
+        \end{center}
+
+        Por ser filtro acoplado, la relación señal a ruido a la salida es:
+        \begin{equation*}
+                \left(\frac{A}{\sigma}\right)^2_{\max} = 2 \frac{A^2}{\eta} ||p||^2 = \frac{4A^2T_s}{3\eta}.
+        \end{equation*}
+
+        Por ser unipolar binario, la probabilidad de error es entonces:
+        \begin{equation*}
+                P_e = Q\left(\frac{A}{2\sigma}\right) = Q\left(\sqrt{\frac{A^2 T_s}{3\eta}}\right)
+        \end{equation*}
+
+        Observación: el espectro del pulso es infinito en frecuencia, por lo que se requiere que el canal tenga suficiente ancho de banda como para no incorporar ISI (al menos $\pm f_s$ para dejar pasar el lóbulo central).
+\end{solucion}
+
 \begin{ejercicio}
 Un sistema de comunicación digital binario utiliza un canal con ruido blanco gaussiano de densidad espectral de potencia $\eta/2=10^{-15}$ $V^2/\unit{\Hz}$. La velocidad de señalización es $1\times 10^6$ Baudios, y los pulsos son rectangulares NRZ.
 \begin{enumerate}
@@ -862,9 +1062,63 @@ Un sistema de comunicación digital binario utiliza un canal con ruido blanco ga
 \end{enumerate}
 \end{ejercicio}
 
+\begin{solucion}
+\begin{enumerate}
+        \item Para el pulso NRZ, $||p||^2 = T_s = 1/f_s$ en este caso. De aquí se deduce que, usando filtro acoplado:
+        \begin{equation*}
+                \left(\frac{A}{\sigma}\right)^2_{\max} = 2 \frac{A^2}{\eta} ||p||^2 = \frac{2A^2}{f_s \eta},
+        \end{equation*}
+        y la probabilidad de error para el caso unipolar queda:
+        \begin{equation*}
+                P_e = Q\left(\sqrt{\frac{A^2}{2f_s \eta}}\right) = 10^{-6}.
+        \end{equation*}
+        De donde:
+        \begin{equation*}
+        \frac{A}{\sqrt{2f_s \eta}} \approx 4.75 \Rightarrow A \approx 213\mu V.
+        \end{equation*}
+
+        La energía media del pulso NRZ es $\bar{E}_p = \frac{A^2}{2}T_s = \frac{A^2}{2f_s}$ y la potencia total es $S = \bar{E}_p f_s = \frac{A^2}{2} \approx 2.26 \times 10^{-8} \approx -46 \mathrm{dBm}$.
+
+        Si la codificación es polar binaria, la probabilidad de error es:
+        \begin{equation*}
+                P_e = Q\left(\sqrt{\frac{2A^2}{f_s \eta}}\right) = 10^{-6}.
+        \end{equation*}
+        De donde:
+        \begin{equation*}
+        A\sqrt{\frac{2}{f_s \eta}} \approx 4.75 \Rightarrow A \approx 106 \mu V.
+        \end{equation*}
+
+        La energía media del pulso NRZ es $\bar{E}_p = A^2 T_s = \frac{A^2}{f_s}$ y la potencia total es $S = \bar{E}_p f_s = A^2 \approx 1.13 \times 10^{-8} \approx -49 \mathrm{dBm}$ (la mitad).
+
+        \item $\mathrm{vti} = 10^6 \unit{\bit/\sec}$, de donde podemos bajar $f_s$ a $f_s = \frac{\mathrm{vti}}{\log_2 M} \approx 333 \unit{\kilo\hertz}$. La probabilidad de error de bit pedida es $10^{-6}$ por lo que la probabilidad de error de símbolo es un poco más alta, $P_e(\mathrm{sym}) = \log_2(M) P_e(\mathrm{bit}) = 3\times 10^{-6}$.
+        
+        Al ser un sistema $M-$ario polar, la probabilidad de error de símbolo es:
+        \begin{equation*}
+                P_e(\mathrm{sym}) = 2\frac{M-1}{M}Q\left(\frac{A}{\sigma}\right) = 2\frac{M-1}{M}Q\left(\frac{A}{\sigma}\right) = \frac{14}{8}Q\left(\frac{A}{\sigma}\right) = 3\times 10^{-6}
+        \end{equation*}
+        De donde se requiere un $A/\sigma \approx 4.64$. Al ser filtro acoplado, el $(A/\sigma)^2$ máximo es $2\frac{A^2}{\eta}||p||^2= 2\frac{A^2}{\eta f_s}$ para el pulso NRZ. Por lo tanto:
+        \begin{equation*}
+        4.64^2 = 2\frac{A^2}{\eta f_s} \Rightarrow A \approx 60 \unit{\mu\volt}
+        \end{equation*}
+
+        La potencia transmitida es $\bar{E}_p f_s$, que en el caso $M-$ario polar queda:
+        \begin{equation*}
+                S = A^2 \frac{M^2-1}{3} \approx 7.55\times 10^{-8} \approx -41\mathrm{dBm}.
+        \end{equation*}
+        Requiere algo más de potencia en menor ancho de banda.
+\end{enumerate}        
+\end{solucion}
+
+
 \begin{ejercicio}
 Un sistema de transmisión con señalización binaria polar, pulsos de Nyquist ideales, y 50 repetidores debe tener probabilidad de error menor que $10^{-4}$. Calcular la relación $(S/N)$ a la entrada de cada repetidor cuando éstos son regenerativos. Repetir para el caso en que los repetidores sean no-regenerativos.
 \end{ejercicio}
+
+\begin{solucion}
+        Tenemos $m=50$ repetidores regenerativos. La probabilidad de error en $m$ etapas debe ser $mp = 10^{-4}$ por lo que la probabilidad de error de etapa debe ser $p=2\times 10^{-6}$. De aquí $\sqrt{(S/N)_1}=4.61$ o bien $(S/N)_1=21.16 \approx 13$ dB.
+
+        Si en cambio los repetidores son no regenerativos, debe ser $Q(\sqrt{(S/N)_m}) = 10^-4$ de donde $(S/N)_m = 13.83$ y por lo tanto $(S/N)_1= m(S/N)_m \approx 692 \approx 28$ dB.  
+\end{solucion}
 
 \begin{ejercicio}
 Sea la onda digital $x_T(t)= \sum_k a_k p_N(t-kT_S)$, con símbolos $a_k \in \{ 0, A, 2A\}$ equiprobables, y pulsos de Nyquist $p_N$ de coseno alzado, y exceso de ancho de banda $\alpha=0.8$.
@@ -875,6 +1129,49 @@ Sea la onda digital $x_T(t)= \sum_k a_k p_N(t-kT_S)$, con símbolos $a_k \in \{ 
 \item Para el detector diseñado, dar una fórmula para la probabilidad de error $P_e$ de símbolo en función de $A$, $f_s$ y la densidad espectral del ruido en el canal $\eta_0$. Evaluar $P_e$ para el caso de densidad espectral de ruido $\eta_0/2=10^{-15} \unit{\square\volt/\hertz}$, amplitud $A=0,6\,\unit{\milli\volt}$, y una velocidad de transmisión de información de 4 \unit{\mega\bit/\sec}.
 \end{enumerate}
 \end{ejercicio}
+
+\begin{solucion}
+\begin{enumerate}
+        \item El pulso $p_N$ requiere un ancho de banda $B = \frac{f_s}{2}(1+\alpha) = 0.9f_s$. La $\mathrm{vti} = \log_2(3)f_s$ de donde la eficiencia queda:
+        \begin{equation*}
+                \mathrm{Eff} = \frac{\mathrm{vti}}{B} = \frac{\log_2(3)}{0.9} \approx 1.76.
+        \end{equation*}
+
+        \item Se debe usar un filtro acoplado, con un pulso de Nyquist de coseno alzado igual a $p_N$. Como este pulso es infinito en el tiempo, se debe tomar un $\tau$ grande como para incluir buena parte de la respuesta del filtro del lado causal (ej: $\tau>4T_s$) y lograr el máximo de acople. Se debe tener cuidado porque este filtro introduce ISI (al ser coseno alzado y caer como $t^3$, la ISI es pequeña y además no se requiere un $\tau$ tan alto).
+        
+        Si se usa el pulso $h(t) = p_N(\tau-t)/||p_N||^2$, en la recepción tendremos aproximadamente los símbolos $0,A,2A$ transmitidos. Conviene usar como umbrales $A/2$ y $3A/2$ para distinguir los símbolos.
+
+        \item Para el sistema de detección anterior, la probabilidad de error de símbolo es:
+        \begin{equation*}
+                P_e(\mathrm{sym}) = Q\left(\sqrt{\frac{A}{2\sigma}}\right) + 2Q\left(\sqrt{\frac{A}{2\sigma}}\right) + Q\left(\sqrt{\frac{A}{2\sigma}}\right) = 4Q\left(\sqrt{\frac{A}{2\sigma}}\right)
+        \end{equation*}
+
+        Al usar filtro acoplado tenemos que en recepción:
+        \begin{equation*}
+                \left(\frac{A}{\sigma}\right)^2_{\max} = 2 \frac{A^2}{\eta} ||p||^2
+        \end{equation*}
+
+        De donde la probabilidad de error queda:
+        \begin{equation*}
+                P_e(\mathrm{sym}) =  4Q\left(\sqrt{\frac{A^2}{\eta}||p||^2}\right)
+        \end{equation*}
+
+        Para completar la expresión, falta calcular la energía del pulso de Nyquist de coseno alzado con exceso $\alpha=0.8$, integrando en frecuencia $\int_{-\infty}^{\infty} |\hat{P}_N(f)|^2df$. Esto da:
+        \begin{equation*}
+                ||p||^2 = T_s\left(1-\frac{\alpha}{4}\right).
+        \end{equation*}
+        Sustituyendo:
+        \begin{equation*}
+                P_e(\mathrm{sym}) =  4Q\left(\sqrt{\frac{0.8 A^2}{\eta f_s}}\right)
+        \end{equation*}
+
+        Para los valores dados, se requiere $\textrm{vti} = 4\times 10^6$ por lo que $f_s = \textrm{vti}/\log_2(3) \approx 2.52 \unit{\mega\hertz}$. Sustituyendo queda:
+        \begin{equation*}
+                \sqrt{\frac{0.8 A^2}{\eta f_s}} = 7.55 \Rightarrow P_e = 4Q(7.55) = 8.4 \times 10^{-14}.
+        \end{equation*}       
+
+\end{enumerate}
+\end{solucion}
 
 \begin{ejercicio}
 Se considera una onda PAM de la forma $\sum_k a_kp(t-kT_s)$, con símbolos $a_k\in\{A_1,A_2\}$, $A_1<A_2$, cuyas probabilidades, $P(A_1)$ y $P(A_2)$, no son necesariamente iguales.
@@ -897,6 +1194,70 @@ y encuentre una expresión para la probabilidad de error $P_e$.
 \end{enumerate}
 \end{ejercicio}
 
+\begin{solucion}
+\begin{enumerate}
+\item La señal contaminada con ruido tiene la siguiente densidad, mezcla de dos Gaussianas:
+        \begin{equation*}
+                f_X(x) = P(A_1) \frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x-A_1)^2}{2\sigma^2}} + P(A_2)\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x-A_2)^2}{2\sigma^2}}.
+        \end{equation*}
+        \begin{center}
+        \begin{tikzpicture}
+                \pgfmathdeclarefunction{gauss}{3}{%
+                \pgfmathparse{1/(#3*sqrt(2*pi))*exp(-((#1-#2)^2)/(2*#3^2))}%
+                }      
+                \begin{axis}[x=2cm, y=5cm, axis lines=middle,  
+                        xlabel=$t$,
+                        ylabel=$f_X(x)$,
+                        x label style={anchor=north},
+                        y label style={anchor=east},
+                        xmin=-1,xmax=4,ymin=-.2,ymax=.8,
+                        xtick={1,1.894,3}, ytick=\empty,
+                        xticklabels={$A_1$, $A^*$, $A_2$},
+                        clip=false,
+                    ]
+                \addplot+[dashed ,mark=none, red, domain=(-1:4), samples=100] {.3*gauss(x,1,.5)};
+                \addplot+[dashed ,mark=none, red, domain=(-1:4), samples=100] {.7*gauss(x,3,.5)};
+                \addplot+[very thick,mark=none, teal, domain=(-1:4), samples=100] {.3*gauss(x,1,.5)+.7*gauss(x,3,.5)};
+                \end{axis}
+        \end{tikzpicture}
+        \end{center}
+        El umbral óptimo es cuando se igualan las densidades de cada símbolo, es decir:
+        \begin{equation*}
+                \frac{P(A_2)}{P(A_1)} = \frac{e^{-\frac{(A^*-A_1)^2}{2\sigma^2}}}{e^{-\frac{(A^*-A_2)^2}{2\sigma^2}}} = e^{\frac{(A^*-A_2)^2-(A^*-A_1)^2}{2\sigma^2}}.
+        \end{equation*}
+        Por lo tanto:
+        \begin{equation*}
+                2\sigma^2 \log\left(\frac{P(A_2)}{P(A_1)}\right) = (A^*-A_2)^2-(A^*-A_1)^2 = (2A^*-A_1-A_2)(A_1-A_2),
+        \end{equation*}
+        de donde despejando $A^*$ se obtiene la fórmula pedida.
+
+        La probabilidad de error es:
+        \begin{equation*}
+                P_e = P(A_1)Q\left(\frac{A^*-A_1}{\sigma}\right)+ P(A_2)Q\left(\frac{A_2-A^*}{\sigma}\right)
+        \end{equation*}
+
+\item   \begin{enumerate}
+        \item En este caso es señalización polar $\pm A$ equiprobable, por lo que el umbral es $0$ y por lo tanto, al usar filtro acoplado tenemos que en recepción:
+        \begin{equation*}
+                \left(\frac{A}{\sigma}\right)^2_{\max} = 2 \frac{A^2}{\eta} ||p||^2
+        \end{equation*}
+        Como vimos antes el pulso de Nyquist de exceso $\alpha$ tiene $||p||^2 = T_s(1-\alpha/4) = (3/4)T_s$ por lo que la probabilidad de error es:
+        \begin{equation*}
+                Q\left(\sqrt{\frac{A}{\sigma}}\right) = Q\left(\sqrt{\frac{3A^2}{2\eta f_s}}\right) \approx Q(6.12) \approx 4.6 \times 10^{-10}. 
+        \end{equation*}
+
+        \item El problema del filtro acoplado es que introduce ISI, que en este caso puede ser peor que el ruido. Por lo tanto, podemos usar un filtro pasabajos ideal de ancho $f_s$, el ancho de banda total del pulso. En ese caso, la onda pasará intacta sin ISI y al muestrearla en los lugares correctos obtenemos la densidad de la parte $1$ si las probabilidades son distintas. En este caso, la varianza del ruido es $\sigma^2 = \eta f_s = 10^{-8}$ ya que no es acoplado (hay exceso de ruido).
+        
+        Calculando para $A_1=-A$, $A_2=A$ y $P(A_1)=\frac{1}{3}=1-P(A_2)$ obtenemos:
+        \begin{equation*}
+                A^* \approx - 6.93\times 10^{-6}, \quad P_e = 2.7\times 10^{-7}
+        \end{equation*}
+
+        El que sean probabilidades diferentes no afecta mucho la probabilidad de error, el problema es el filtro no acoplado. Si fueran equiprobables los símbolos la prob. de error sería $2.86\times 10^{-7}$, bastante mayor que en la parte anterior.
+        \end{enumerate}
+\end{enumerate}
+\end{solucion}
+
 \begin{ejercicio}
 
 Se considera un canal digital de banda base contaminado con ruido blanco de densidad espectral $\eta_0/2 = 10^{-5}\,\unit{\square\volt/\hertz}$. Se utiliza señalización polar con símbolos equiprobables de amplitud $A=3.0\,V$ en la recepción, y velocidad de señalización $f_s=10\,\unit{\kilo\baud}$. Se utilizan pulsos triangulares de la forma:
@@ -918,6 +1279,28 @@ amplificadores:
 \end{enumerate}
 \end{enumerate}
 \end{ejercicio}
+
+\begin{solucion}
+        \begin{enumerate}
+                \item Si se usa filtro acoplado y señalización polar, la relación a la salida es:
+                \begin{equation*}
+                        \left(\frac{A}{\sigma}\right)^2_{\max} = 2 \frac{A^2}{\eta}||p||^2
+                \end{equation*}
+                Para este pulso $||p||^2$ se puede obtener integrando en el tiempo y da $||p||^2 = T_s/3$. Como la señalización es polar, el umbral es $0$ y por lo tanto:
+                \begin{equation*}
+                        P_e = Q\left(\sqrt{\frac{2A^2}{3\eta f_s}}\right) \approx Q(5.48) \approx 2.2\times 10^{-8}.
+                \end{equation*}
+
+                \item \begin{enumerate}
+                        \item Si son regenerativos, la probabilidad de error es $\approx m P_e \approx 2.2 \times 10^{-7}$.
+                        \item Si no son regeneativos, la $(A/\sigma)^2_{\max}$ se degrada por $m$ por lo que:
+                        \begin{equation*}
+                                P_e = Q\left(\sqrt{\frac{2A^2}{(10) 3\eta f_s}}\right) \approx Q(1.73) \approx 0.041. 
+                        \end{equation*}
+                \end{enumerate}
+        \end{enumerate}
+\end{solucion}
+
 
 \section{Modulación digital pasabanda}
 
