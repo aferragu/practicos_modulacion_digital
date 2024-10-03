@@ -537,7 +537,7 @@ Observación: $p(t)$ puede escribirse como la convolución de dos pulsos de anch
         \end{itemize}
         La expresión completa es:
         \begin{equation*}
-                S_x(f) = \frac{A^2}{16}T_s \sinc^4\left(\pi\frac{f}{f_s}\right) + \frac{A^2}{16} \delta(0).
+                S_x(f) = \frac{A^2}{4}T_s \sinc^4\left(\pi\frac{f}{f_s}\right) + \frac{A^2}{4} \delta(0).
         \end{equation*}
 
         \begin{center}
@@ -555,8 +555,8 @@ Observación: $p(t)$ puede escribirse como la convolución de dos pulsos de anch
                                 xticklabels={$-3f_s$,$-2f_s$,$-f_s$,$0$,$f_s$,$2f_s$,$3f_s$},
                                 clip=false,
                             ]
-                        \addplot+ [mark=none, solid,very thick, teal, domain=(-3.5:3.5), samples=100] {sinc(pi*x)^4} node[midway,above right] {\small $\frac{A^2}{16}T_s$};
-                        \draw[very thick, -stealth, teal] (axis cs:0,0) -- (axis cs:0,1) node[midway,right] {\small $\frac{A^2}{16}$};
+                        \addplot+ [mark=none, solid,very thick, teal, domain=(-3.5:3.5), samples=100] {sinc(pi*x)^4} node[midway,above right] {\small $\frac{A^2}{4}T_s$};
+                        \draw[very thick, -stealth, teal] (axis cs:0,0) -- (axis cs:0,1) node[midway,right] {\small $\frac{A^2}{4}$};
                         \end{axis}
                 \end{tikzpicture}
         \end{center}
@@ -645,7 +645,7 @@ Observación: $p(t)$ puede escribirse como la convolución de dos pulsos de anch
                         \begin{tikzpicture}
                                 \begin{axis}[x=1.8cm, y=1.5cm, axis lines=middle,  
                                          xlabel=$f$,
-                                         ylabel=$\hat{\tilde{P}}(f)$,
+                                         ylabel=$S_x(f)$,
                                          x label style={anchor=north},
                                          y label style={anchor=east},
                                          xmin=-3.5,xmax=3.5,ymin=-.2,ymax=1.7,
@@ -654,9 +654,9 @@ Observación: $p(t)$ puede escribirse como la convolución de dos pulsos de anch
                                          clip=false,
                                      ]
                                 \addplot+ [mark=none, solid,very thick, teal, domain=(-3.5:3.5), const plot] coordinates {
-                                        (-3.5,0) (-3,.25) (-2,1) (0,1) (2,.25) (3,0) (3.5,0)} node[midway,above right] {$\frac{355}{384}A^2$};
-                                \node[teal, above] at (axis cs:2.5,.25) {$\frac{355}{768}A^2$};
-                                \draw[very thick, -stealth, teal] (axis cs:0,0) --(axis cs:0,1.2) node[midway,right] {$\frac{25}{36}\mu^2$};
+                                        (-3.5,0) (-3,.25) (-2,1) (0,1) (2,.25) (3,0) (3.5,0)} node[midway,above right] {$0.92 A^2 T_s$};
+                                \node[teal, above] at (axis cs:2.5,.25) {$0.23 A^2T_s$};
+                                \draw[very thick, -stealth, teal] (axis cs:0,0) --(axis cs:0,.8) node[midway,right] {$0.53 A^2$};
                                 \end{axis}
                         \end{tikzpicture}
                 \end{center}
@@ -685,6 +685,102 @@ Sea la onda PAM $x(t)=\sum_k a_k p(t-k T_s)$ con el pulso
 \end{enumerate}
 \end{ejercicio}
 
+\begin{solucion}
+        \begin{enumerate}
+        \item Comencemos analizando el pulso en frecuencia. El término $B \sinc^2 (\pi B t)$ corresponde a un espectro triangular en frecuencia, de ancho total $2B$ y alto $1$ (en gris). El término $2\cos(\pi B t)$ corresponde a dos deltas de alto $1$ en $\pm B/2$ de frecuencia. Convolucionando el triángulo con cada delta (en rojo) y sumando queda:
+        
+        \begin{center}
+                \begin{tikzpicture}
+                        \begin{axis}[x=1.8cm, y=1.5cm, axis lines=middle,  
+                                 xlabel=$f$,
+                                 ylabel=$\hat{P}(f)$,
+                                 x label style={anchor=north},
+                                 y label style={anchor=east},
+                                 xmin=-3.5,xmax=3.5,ymin=-.2,ymax=1.5,
+                                 xtick={-3,-2,-1,0,1,2,3}, ytick=\empty,
+                                 xticklabels={$-3B/2$, $-B$, $-B/2$,$0$,$B/2$,$B$, $3B/2$},
+                                 clip=false,
+                             ]
+                        \addplot+ [mark=none, solid, gray] coordinates {
+                                (-3.5,0) (-2,0) (0,1) (2,0) (3.5,0)
+                        };
+                        \draw[thick,gray,-stealth] (axis cs:-1,0) -- (axis cs:-1,1);
+                        \draw[thick,gray,-stealth] (axis cs:1,0) -- (axis cs:1,1);
+                        \addplot+ [mark=none, dashed, red!50!white] coordinates {
+                                (-3.5,0) (-3,0) (-1,1) (1,0) (3.5,0)
+                        };
+                        \addplot+ [mark=none, dashed, red!50!white] coordinates {
+                                (-3.5,0) (-1,0) (1,1) (3,0) (3.5,0)
+                        };
+                        \addplot+ [mark=none, very thick, solid, teal] coordinates {
+                                (-3.5,0) (-3,0) (-1,1) (1,1) (3,0) (3.5,0)
+                        } node[midway, above right] {$1$};
+                        \end{axis}
+                \end{tikzpicture}
+        \end{center}
+        Notemos que el pulso presenta simetría vestigial alrededor de $B$, por lo que podemos tomar $f_s = 2B$ para no tener ISI. Si queremos visualizarlo en el tiempo, notemos que $\sinc\left(\pi B \frac{k}{2B}\right)$ se anula en los múltiplos pares de $k$, mientras que $\cos\left(\pi B \frac{k}{2B}\right)$ se anula en los múltiplos impares. Entre ambos nos permiten usar todos los múltiplos de $T_s=\frac{1}{2B}$ sin ISI.
+
+        \begin{center}
+                \begin{tikzpicture}
+                        \pgfmathdeclarefunction{sinc}{1}{%
+                        \pgfmathparse{(#1==0 ? 1: sin(#1 r))/(#1==0 ? 1: #1)}%
+                        }
+                        \begin{axis}[   x=1.8cm, y=2cm, axis lines=middle,  
+                                xlabel=$f$,
+                                ylabel=$p(t)$,
+                                x label style={anchor=north},
+                                y label style={anchor=east},
+                                xmin=-3.5,xmax=3.5,ymin=-.2,ymax=1.5,
+                                xtick={-3,-2,-1,0,1,2,3}, ytick=\empty,
+                                xticklabels={$-\frac{3}{2B}$,$-\frac{1}{B}$, $-\frac{1}{2B}$,$0$,$\frac{1}{2B}$,$\frac{1}{B}$,$\frac{3}{2B}$},
+                                clip=false,
+                            ]
+                        \addplot+ [mark=none, solid,very thick, teal, domain=(-3.5:3.5), samples=100] {sinc(pi*x/2)^2*cos(deg(pi*x/2))} node[midway,above right] {$2B$};
+                        \end{axis}
+                \end{tikzpicture}
+        \end{center}
+
+        \item Calculamos primero:
+         \begin{align*}
+                \mu &= 0 (1/3) + A (1/3) + 2A (1/3) = A \Rightarrow \mu^2 = A^2\\
+                E[a_k^2] &= 0 (1/3) + A^2 (1/3) + 4A^2 (1/3) = (5/3)A^2 \\
+                \sigma^2 &= (2/3)A^2
+         \end{align*}
+
+         El espectro tendrá una parte continua, correspondiente a elevar al cuadrado el trapecio (ver ej. 1.5 para un caso similar). Como además, $\mu\neq 0$, habrá un término de continua. Como el espectro del pulso finaliza antes de $f_s = 2B$, no habrá otros armónicos.
+
+         Bosquejo:
+         \begin{center}
+                \begin{tikzpicture}
+                        \begin{axis}[x=1.8cm, y=1.5cm, axis lines=middle,  
+                                xlabel=$f$,
+                                ylabel=$S_x(f)$,
+                                x label style={anchor=north},
+                                y label style={anchor=east},
+                                xmin=-3.5,xmax=3.5,ymin=-.2,ymax=1.5,
+                                xtick={-3,-2,-1,0,1,2,3}, ytick=\empty,
+                                xticklabels={$-3B/2$, $-B$, $-B/2$,$0$,$B/2$,$B$, $3B/2$},
+                                clip=false,
+                            ]
+                        \addplot+[very thick,mark=none, const plot, teal, domain=(-1:1)] {1} node[above right,midway]{$A^2/(3B)$};
+                        \addplot+[very thick,mark=none, teal, domain=(-3:-1)] {(x+3)^2/4};
+                        \addplot+[very thick,mark=none, teal, domain=(1:3)] {(3-x)^2/4};
+                        \draw[very thick, -stealth, teal] (axis cs:0,0) --(axis cs:0,.8) node[midway,right] {$4A^2B^2$};
+                        \end{axis}
+                \end{tikzpicture}              
+        \end{center}
+
+        Se tiene que:
+        \begin{equation*}
+                S = \int_{-\infty}^\infty S_x(f)df = \left(\frac{1}{3}\right)\frac{A^2}{3B}B + \frac{A^2}{3B}B+ \left(\frac{1}{3}\right)\frac{A^2}{3B}B + 4A^2B^2= \left(\frac{5}{9}\right) A^2 + 4A^2 B^2.
+        \end{equation*}
+
+        Para la energía media del pulso transmitido, necesitamos calcular $\bar{E}_p = E[a_k^2]||p||^2$. Para calcular $||p||^2$ conviene hacerlo en frecuencia elevando al cuadrado $|\hat{P}(f)|$ obteniendo:
+        \begin{equation*}
+                \bar{E}_p = (5/3)A^2 [(1/3)B + B + (1/3)B] = \frac{25}{9}A^2B
+        \end{equation*}
+        \end{enumerate}
+\end{solucion}
 \begin{ejercicio}
 Sea la onda PAM $x(t)=\sum_k a_k p(t-k T_s)$, con el pulso
 \begin{equation*}
