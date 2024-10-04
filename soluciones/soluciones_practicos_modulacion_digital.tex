@@ -1640,6 +1640,57 @@ $\frac{\eta}{2}$ la densidad espectral de potencia del ruido blanco del canal. T
 
 \end{ejercicio}
 
+\begin{solucion}
+
+        \begin{enumerate}
+                \item La señal a la entrada del integrador (ignorando el ruido), denotando $\theta_k=a_k\pi$ es:
+                \begin{align*}
+                        y(t) &= 2x_c(t)x_c(t-T_s) \\
+                        &= 2\left(\sum_k Ap(t-kT_s)\cos(\omega_c t + \theta_k)\right)\left(\sum_{k'} Ap(t-T_s-k'T_s)\cos(\omega_c t + \theta_k')\right)
+                \end{align*}
+                Notar que en el producto, los pulsos están desfasados y por lo tanto los productos cruzados dan $0$, excepto cuando $k'=k-1$, que da $p^2=1=p$, de donde:
+                \begin{align*}
+                        y(t) &= 2\sum_k Ap(t-kT_s)\cos(\omega_c t + \theta_k)\cos(\omega_c t + \theta_{k-1}) \\
+                             &= \sum_k Ap(t-kT_s)\cos(\theta_k-\theta_{k-1}) + \ldots \\
+                \end{align*}
+                donde despreciamos los términos de alta frecuencia que se irán al filtrar (aquí usamos que en un tiempo de símbolo hay una cantidad entera de oscilaciones de la portadora, por hipótesis).
+
+                Integrando en un período hallamos $z_k$:
+                \begin{equation*}
+                        z_k = \frac{1}{T_s}\int_{kT_s}^{(k+1)T_s} y(t)dt = \frac{1}{T_s}\int_{kT_s}^{(k+1)T_s} Ap(t-kT_s)\cos(\theta_k-\theta_{k-1}) = A\cos(\theta_k-\theta_{k-1})    
+                \end{equation*}
+                Notar que $z_k = 2A$ si $\theta_k \neq \theta_{k-1}$ y $0$ si $\theta_k=\theta_{k-1}$. Por eso se denomina demodulador diferencial, solo detecta cambios de símbolo o diferencias de fase.
+                Resumiendo:
+                \begin{equation*}
+                        \begin{cases}
+                                m_k = 1 & \text{si }a_k\neq a_{k-1}\\
+                                m_k = 0 & \text{si }a_k = a_{k-1}
+                        \end{cases}
+                \end{equation*}
+                
+                \item Usando la idea anterior, $a_1\ldots a_8 = 01111011$.
+                
+                \item Tomando $\gamma = \bar{E}_p/\eta$, se tiene que:
+                 \begin{align*}
+                        P_e(\text{BPSK coh}) &= Q(\sqrt{2\gamma}), \\
+                        P_e(\text{DBPSK} ) &= \frac{1}{2} e^{-\gamma}.
+                 \end{align*}
+                
+                 Usando la aproximación $Q(x) \approx \frac{1}{\sqrt{2\pi} x}e^{-x^2/2}$, podemos escribir:
+                 \begin{equation*}
+                        \frac{P_e(\text{DBPSK})}{P_e(\text{BPSK coh})} = \frac{\frac{1}{2}e^{-\gamma}}{\frac{1}{\sqrt{4\pi\gamma}}e^{-\gamma}} = \sqrt{\pi\gamma}.
+                 \end{equation*}
+                 
+                 La performance de DBPSK es levemente peor (en escala logarítmica). Graficamos a continuación ambas en función de $\gamma$:
+                 \begin{center}
+                        \input{ej3_6.tikz}
+                 \end{center}
+
+        \end{enumerate}
+        
+\end{solucion}
+
+
 \begin{ejercicio}
 Un broadcaster tiene un flujo de video de 30 Mbps que se desea transportar via satélite. Se decide utilizar modulación 4-QAM con pulsos de Nyquist de coseno elevado con exceso de ancho de banda $\alpha=0.2$.
 \begin{enumerate}
