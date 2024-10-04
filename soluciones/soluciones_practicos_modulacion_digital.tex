@@ -1413,19 +1413,16 @@ $\gamma:=\frac{\overline{E}_p}{\eta}$.
 Se considera un sistema de transmisión digital pasabanda que utiliza los siguientes $M=8$ pulsos de radio frecuencia 
 \begin{align*} & A p_R(t)[\pm \cos(2\pi f_c t) \pm \sen(2\pi f_c t)],\\ & A p_R(t)[\pm 3\cos(2\pi f_c t)
 \pm \sen(2\pi f_c t)].
-%\[s_3= A p_R(t)[\cos(2\pi f_c t) - \sen(2\pi f_c t)],\]
-%\[s_4= A p_R(t)[3\cos(2\pi f_c t) - \sen(2\pi f_c t)],\]
-%\[s_5=-s_1,\;\; s_6=-s_2, \;\;  s_7=-s_3 \;\;\text{y}\;\; s_8=-s_4.\]
 \end{align*}
 Aquí $p_R(t)$ es el pulso rectangular NRZ. 
 
 \begin{enumerate}
-\item Dibujar un diagrama de la constelaci{ó}n de s{\'\i}mbolos
+\item Dibujar un diagrama de la constelación de símbolos
 utilizada. Mostrar una codificación de Gray para representar 3
 bits mediante esta constelación.
 \item Suponiendo símbolos equiprobables, hallar la densidad
 espectral de potencia de la señal digital correspondiente.
-\item Dise{ñ}ar en diagrama de bloques un detector apropiado para este sistema.
+\item Diseñar en diagrama de bloques un detector apropiado para este sistema.
 \item Si el canal presenta ruido blanco gaussiano de densidad espectral de
 potencia $\eta/2$, hallar una fórmula para la probabilidad $P_e$
 de error de símbolo para el sistema, en función de
@@ -1439,6 +1436,128 @@ términos de eficiencia espectral?
 \end{enumerate}
 \end{ejercicio}
 
+\begin{solucion}
+        \begin{enumerate}
+                \item Tomando las componentes que multiplican a $\sin$ y $\cos$ como componentes en fase y cuadratura en banda base, los símbolos complejos son:
+                \begin{center}
+                        \begin{tikzpicture}
+                                \begin{axis}[x=1cm, y=1cm, axis lines=middle,  
+                                        xlabel=$a_k$,
+                                        ylabel=$b_k$,
+                                        x label style={anchor=north west},
+                                        y label style={anchor=south east},
+                                        xmin=-3.5,xmax=3.5,ymin=-1.5,ymax=1.5,
+                                        xtick={-3,-1,0,1,3}, ytick={-1,0,1},
+                                        xticklabels={$-3A$, $-A$, $0$, $A$, $3A$},
+                                        yticklabels={$-A$, $0$, $A$},
+                                        clip=false,
+                                    ]
+                                \addplot+[only marks, teal] coordinates {
+                                        (-3,-1) (-3,1) (-1,-1) (-1,1) 
+                                        (1,-1) (1,1) (3,-1) (3,1)
+                                };
+                                \node[below] at (axis cs:-3,-1) {\tiny (000)};
+                                \node[below] at (axis cs:-3,1) {\tiny (100)};
+                                \node[below] at (axis cs:-1,-1) {\tiny (001)};
+                                \node[below] at (axis cs:-1,1) {\tiny (101)};
+                                \node[below] at (axis cs:1,-1) {\tiny (011)};
+                                \node[below] at (axis cs:1,1) {\tiny (111)};
+                                \node[below] at (axis cs:3,-1) {\tiny (010)};
+                                \node[below] at (axis cs:3,1) {\tiny (110)};
+
+                                \end{axis}
+                        \end{tikzpicture}
+                \end{center}
+
+                Ya agregamos la codificación de Gray adecuada (básicamente dos codificaciones de Gray de 4 bits para $a_k$, y el bit mas significativo determina el $b_k$).
+
+                \item Observando que la constelación está centrada en $0$, $\mu=0$ y calculando los módulos de la constelación:
+                      \begin{equation*}
+                      E[c_k^2] = E[a_k^2+b_k^2] = 4 (1/8) (A^2 + A^2) + 4 (1/8) (A^2+9A^2) = 6A^2
+                      \end{equation*}
+
+                La densidad espectral de potencia en banda base será:
+                \begin{equation*}
+                        S_{x_{ce}} (f) = 6A^2 f_s |\hat{P}(f)|^2 = 6A^2 T_s \sinc^2(\pi T_s f).
+                \end{equation*}
+                donde se usó que el pulso es NRZ. Luego se modula obteniendo:
+                \begin{equation*}
+                        S_{x_c} = \frac{1}{4}\left[S_{x_{ce}}(f-f_c) + S_{x_{ce}}(f+f_c)\right].
+                \end{equation*}
+
+                Bosquejo (para $f>0$):
+                \begin{center}
+                        \begin{tikzpicture}
+                        \pgfmathdeclarefunction{sinc}{1}{%
+                        \pgfmathparse{(#1==0 ? 1: sin(#1 r))/(#1==0 ? 1: #1)}%
+                        }
+                                \begin{axis}[x=1cm, y=1cm, axis lines=middle,  
+                                        xlabel=$S_{x_c}(f)$,
+                                        ylabel=$f$,
+                                        x label style={anchor=north west},
+                                        y label style={anchor=south east},
+                                        xmin=-.1,xmax=8,ymin=-.1,ymax=1.5,
+                                        xtick={3.5,5,6.5}, ytick=\empty,
+                                        xticklabels={$f_c-f_s$,$f_c$,$f_c+f_s$},
+                                        clip=false,
+                                    ]
+                                \addplot+[solid, mark=none, very thick, teal, domain = (2:8), samples=100]  {
+                                        sinc(pi*(x-5)/1.5)^2
+                                } node[midway, above right] {$\frac{3}{2}A^2 T_s$};
+
+                                \draw[dashed] (axis cs:5,0) -- (axis cs:5,1.5);
+                                \end{axis}
+
+                        \end{tikzpicture}
+                \end{center}
+
+                \item Podemos aplicar detección coherente multiplicando por $2\cos(\omega_c t)$ y $-2\sin(\omega_c t)$ y luego aplicando filtro acoplado. Esto es equivalente a:
+                 \begin{itemize}
+                        \item Una detección $M-$aria para $a_k$ en banda base, con $M=4$.
+                        \item Una detección binaria para $b_k$.
+                 \end{itemize}
+
+                 \item Usamos la observación anterior para la probabilidad de error:
+                     \begin{align*}
+                        P_e(a_k) &= 2\frac{M-1}{M}Q(A/\sigma) = \frac{3}{2}Q(A/\sigma),\\
+                        P_e(b_k) &= Q(A/\sigma),\\
+                        P_e &\approx P_e(a_k) + P_e(b_k) = \frac{5}{2}Q(A/\sigma).
+                     \end{align*}
+
+                     Como el filtro es acoplado, se tiene que:
+                     \begin{equation*}
+                        \left(\frac{A}{\sigma}\right)^2_{\max} = 2 \frac{A^2}{\eta}||p||^2 = 2\frac{A^2}{\eta f_s}.
+                     \end{equation*}
+
+                     Si lo llevamos a energía media del pulso de radiofrecuencia, se tiene que:
+                     \begin{equation*}
+                        \bar{E}_p = E[c_k^2]||\tilde{p}||^2 = 6 A^2 T_s/2 = 3A^2T_s \Rightarrow \frac{A^2}{f_s} = \frac{\bar{E}_p}{3}
+                     \end{equation*}
+                     De donde:
+                     \begin{equation*}
+                        \left(\frac{A}{\sigma}\right)^2_{\max} = \frac{2\bar{E}_p}{3\eta f_s} \Rightarrow P_e = Q\left(\sqrt{\frac{2\bar{E}_p}{3\eta f_s} }\right) = Q\left(\sqrt{2\gamma/3}\right).
+                     \end{equation*}
+                
+
+                \item Se tiene la siguiente comparación, usando que la probabilidad de error de $8-$PSK es:
+                \begin{equation*}
+                        P_e \approx 2 Q\left(\sqrt{2\gamma\sin^2(\pi/M)}\right)
+                \end{equation*}
+                \begin{center}
+                        \input{ej3_4.tikz}
+                \end{center}
+
+                \item Se tiene la siguiente comparación, usando la expresión para un sistema $M-$ario en banda base:
+                \begin{equation*}
+                        P_e = 2 \frac{M-1}{M} Q\left(\sqrt{\frac{3\gamma}{M^2-1}}\right)
+                \end{equation*}
+                \begin{center}
+                        \input{ej3_4b.tikz}
+                \end{center}
+        \end{enumerate}
+\end{solucion}
+
+
 \begin{ejercicio}
 En los sistemas coherentes donde se debe enviar una pequeña señal piloto para la sincronización, empeora la eficiencia. Considere un sistema digital BPSK, cuya onda trasmitida es
 \begin{equation*}
@@ -1447,6 +1566,25 @@ En los sistemas coherentes donde se debe enviar una pequeña señal piloto para 
 \end{equation*}
 donde $a_k=\{+A,-A\}$, $0<\mu<1$, y $p_R(t)$ es el pulso rectangular NRZ de largo $T_s$. Calcule la probabilidad de error de símbolo en función de la densidad espectral de potencia del ruido $\frac{\eta}{2}$ y la potencia media trasmitida. Compare el resultado con el que se obtendría si no se enviara la portadora piloto $s_c(t)=\mu A\sin(\omega_c t)$.
 \end{ejercicio}
+
+\begin{solucion}
+La onda enviada tiene una componente BPSK y una componente de portadora. La componente BPSK tiene amplitudes $a'_k = \pm A\sqrt{1-\mu^2}$ por lo que la potencia es $S_{\mathrm{bpsk}} = E[(a'_k)^2] f_s ||\tilde{p}||^2$ siendo $||\tilde{p}||$ el pulso NRZ en radiofrecuencia, de energía $T_s/2$. Por lo tanto: 
+\begin{equation*}
+        S_{\mathrm{bpsk}}=\frac{1}{2}E[(a'_k)^2] = \frac{A^2 (1-\mu^2)}{2}.        
+\end{equation*}
+
+La parte sinusoidal de portadora es de potencia $\frac{A^2\mu^2}{2}$ por lo que la potencia total transmitida es $S=A^2$. Es decir, usamos la misma potencia total que un BPSK común, pero usamos un índice de modulación $\mu$ para la portadora, reservando una fracción de potencia para la misma.
+
+Si aplicamos detección coherente a la parte BPSK, tenemos que usar $A' = A\sqrt{1-\mu^2}$ por lo que sustituyendo en la expresión de BPSK queda:
+\begin{equation*}
+        P_e = Q\left(A'/\sigma\right) = Q\left(\sqrt{\frac{A^2(1-\mu^2)}{\eta f_s}}\right) = Q\left(\sqrt{2\gamma(1-\mu^2)}\right),
+\end{equation*}
+donde usamos que $\gamma = \bar{E}_p/\eta$ con $\bar{E}_p = A^2/2$, la energía del pulso equivalente en BPSK sin portadora. A continuación una comparación del efecto de $\mu$ para $\gamma = 20$ dB.
+\begin{center}
+        \input{ej3_5.tikz}
+\end{center}
+
+\end{solucion}
 
 \begin{ejercicio}
 El sistema de la figura es un detector diferencial no coherente para
