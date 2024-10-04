@@ -1308,9 +1308,63 @@ amplificadores:
 Un sistema de señalización binaria BPSK trasmite información a una velocidad de $2.5 \unit{\mega\bit/\second}$. El ruido en el canal es blanco y gaussiano de densidad espectral de potencia $\eta_0/2=10^{-20}\unit{\square\volt/\hertz}$. La amplitud de la señal a la entrada del detector es $A=1\unit{\micro\volt}$. Asumiendo que se trata de detección coherente con filtro acoplado, determinar la probabilidad de error de bit.
 \end{ejercicio}
 
+\begin{solucion}
+        La detección coherente BPSK se transforma en banda base a detectar $\pm A$ con umbral $0$ y potencia del ruido $\sigma^2 = \eta f_s$, de donde:
+        \begin{equation*}
+                P_e = Q\left(\frac{A}{\sigma}\right)=Q\left(\sqrt{\frac{A^2}{\eta f_s}}\right) \approx Q(4.47) \approx 3.9\times 10^{-6}.
+        \end{equation*}
+\end{solucion}
+
 \begin{ejercicio}
 En la detección BPSK coherente, investigar el efecto de un error de fase $\theta$ entre el oscilador local y la portadora. Hallar la expresión para la probabilidad de error de detección.
 \end{ejercicio}
+
+\begin{solucion}
+Recordemos el diagrama de detección coherente BPSK, pero introduciendo un error de fase en el demodulador:
+
+\begin{blockdiagram}[decoration={brace,amplitude=10}]
+        \matrix[row sep=5 mm, column sep=8mm, ampersand replacement=\&]{
+            \& \& \& \& \& \node[punto] (p1) {}; \& \node[etiqueta] (muestreo) {};\\
+            \node [etiqueta] (p6) {$x_c(t)+n(t)$}; \& \node[operator] (mult) {$\times$}; \& \node [block] (filtro) {$\displaystyle \frac{1}{T_s} \int_{t-T_s}^t$}; \& \node [punto] (p2) {}; \&\node [punto] (p3) {}; \& \&\node [punto] (p4) {}; \&\node [block] (comp) {COMP};\\
+            \& \node [etiqueta] (osc) {$2\cos(\omega_ct + \theta)$}; \& \& \& \node [block] (sinc) {SINCR}; \& \node [punto] (p5) {};\\
+        };
+        \draw [-stealth] (p6.east) --  (mult);
+        \draw [-stealth] (mult) -- node [anchor=south] {$x_o(t)$} (filtro);
+        \draw [-stealth] (osc) -- (mult);
+        %\draw (filtro) -- (p2) -- (p3) -- (muestreo);
+        \draw (filtro) -- (p2) -- node [anchor=south] {$y$} (p3) -- (muestreo);
+        \draw [-stealth] (p2) |- (sinc);
+        \draw (sinc) -- (p5);
+        \draw [-stealth,dashed] (p5) -- (p1);
+        \draw [-stealth] (p4) -- (comp);
+        %\draw [decorate]  (filtro.south east) --node [below=3mm] {\parbox{3cm}{filtro acop. a NRZ, integra en un período de símb.}} (filtro.south west);
+    \end{blockdiagram}
+    
+    con $x_c(t) = \sum_k a_k p(t-kT_s) \cos(\omega_c t)$. Emulando el análisis para detección coherente:
+    \begin{align*}
+        x_o(t)  &= [x_c(t)+n(t)]2\cos(\omega_c t + \theta) \\
+                &= [x_c(t) + n_i(t)\cos(\omega_c t) - n_q(t)\cos(\omega_c t)]2\cos(\omega_c t + \theta)
+    \end{align*}
+    Aplicando las identidades trigonométricas adecuadas para los términos producto, tendremos:
+    \begin{equation*}
+        x_o(t) = \sum_k a_k p(t-kT_s) \cos(\theta) + n_i(t)\cos(\theta) - n_q(t)\sin(\theta) + \ldots
+    \end{equation*}
+    donde los puntos representan términos de alta frecuencia que se irán luego de filtrar y ya los despreciamos.
+    
+    Como los ruidos $n_i(t)$ y $n_q(t)$ son independientes, la combinación lineal dará un ruido $n_b(t)$ en banda base de densidad espectral $\eta\cos^2(\theta) + \eta \sin^2(\theta) = \eta$, por lo que la potencia del ruido no cambia por el error de fase.
+
+    En cambio, la amplitud del símbolo $a_k$ se ve atenuada por un factor $\cos(\theta)$ que depende del error. Si utilizamos el filtro acoplado, lograremos:
+    \begin{equation*}
+        \left( \frac{A'}{\sigma}\right)^2_{\max} = \frac{A^2 \cos^2(\theta)}{\eta}||p||^2 = \frac{A^2 \cos^2(\theta)}{\eta f_s},
+    \end{equation*}
+    de donde
+    \begin{equation*}
+        Q\left(\sqrt{\frac{A'}{\sigma}}\right) = Q\left(\sqrt{\frac{A^2 \cos^2(\theta)}{\eta f_s}}\right).
+    \end{equation*}
+
+    En particular, si $\theta = \pm \pi/2$ estoy completamente fuera de fase y solo queda el ruido, pierdo completamente información cruzada del símbolo (prob. de error $\to 1/2$). Si en cambio $\theta>\pi/2$ tenemos inversión de símbolos, porque cambia el signo de $\cos(\theta)$. En el caso extremo de $\theta=\pi$ (medio ciclo), decodificamos el mensaje al revés.
+
+\end{solucion}
 
 \begin{ejercicio}
 Considere el sistema QPSK cuya señal transmitida es
@@ -1326,6 +1380,34 @@ $\gamma:=\frac{\overline{E}_p}{\eta}$.
 \end{enumerate}
 \end{ejercicio}
 
+\begin{solucion}
+        \begin{enumerate}
+        \item  Si multiplicamos $x_c$ por el generador local $2\cos(\omega_c t + \pi/4)$ y despreciamos los términos de alta frecuencia, nos queda:
+        \begin{align*}
+                x_1(t) &= \sum_k Ap_R(t-kT_s)\cos(\omega_c t + \theta_k)2\cos(\omega_c t + \pi/4) \\
+                &= \sum_k Ap_R(t-kT_s)\cos(\theta_k-\pi/4) + \ldots
+        \end{align*}
+        Con el mismo razonamiento, multiplicando por el otro oscilador:
+        \begin{align*}
+                x_2(t) &= \sum_k Ap_R(t-kT_s)\cos(\omega_c t + \theta_k)2\cos(\omega_c t + 3\pi/4) \\
+                &= \sum_k Ap_R(t-kT_s)\cos(\theta_k-3\pi/4) + \ldots
+        \end{align*}
+
+        Notemos que si $\theta_k=0$ o $\pi/2$, $x_1$ produce la misma señal de amplitud $(A/\sqrt{2})p_R$, pero $x_2$ cambia de signo. Razonando de este modo, hacemos un filtro acoplado a cada una de las señales y regeneramos de acuerdo a:
+        \begin{equation*}
+                \begin{cases}
+                        x_1 = A/\sqrt{2}, x_2 = -A/\sqrt{2} & \mapsto \theta_k = 0,\\
+                        x_1 = A/\sqrt{2}, x_2 = A/\sqrt{2} & \mapsto \theta_k = \pi/2,\\
+                        x_1 = -A/\sqrt{2}, x_2 = A/\sqrt{2} & \mapsto \theta_k = \pi,\\
+                        x_1 = -A/\sqrt{2}, x_2 = -A/\sqrt{2} & \mapsto \theta_k = 3\pi/4.
+                \end{cases}
+        \end{equation*}
+
+        \item Para el sistema anterior, la probabilidad de error de símbolo es igual a un sistema $4-QAM$ con amplitud $A/\sqrt{2}$. En cada señal usamos $0$ como umbral por lo que la probabilidad de error en $x_1$ o en $x_2$ es $Q(A/(\sqrt{2}\sigma))$ y la probabilidad total es $P_e\approx 2Q(A/(\sqrt{2}\sigma))$.
+        
+        Observando que $\bar{E}_p = A^2 T_s$ y $\sigma^2=\eta f_s$, la expresión queda $P_e \approx 2Q\left(\sqrt{\frac{\bar{E}_p}{2\eta}}\right) = 2Q(\sqrt{\gamma/2})$.
+\end{enumerate}
+\end{solucion}
 
 \begin{ejercicio}
 Se considera un sistema de transmisión digital pasabanda que utiliza los siguientes $M=8$ pulsos de radio frecuencia 
