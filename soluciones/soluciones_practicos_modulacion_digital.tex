@@ -2,12 +2,9 @@
 
 \usepackage{amsmath}
 \usepackage{array}
-\usepackage{amssymb}
 \usepackage{amsthm}
-%\usepackage{mathtools}
 \usepackage{ifthen}
 \usepackage[utf8]{inputenc}
-%\usepackage{lmodern}
 \usepackage[adobe-utopia]{mathdesign}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
@@ -1452,7 +1449,7 @@ términos de eficiencia espectral?
                                         yticklabels={$-A$, $0$, $A$},
                                         clip=false,
                                     ]
-                                \addplot+[only marks, teal] coordinates {
+                                \addplot+[only marks, teal, mark options={fill=teal}] coordinates {
                                         (-3,-1) (-3,1) (-1,-1) (-1,1) 
                                         (1,-1) (1,1) (3,-1) (3,1)
                                 };
@@ -1492,8 +1489,8 @@ términos de eficiencia espectral?
                         \pgfmathparse{(#1==0 ? 1: sin(#1 r))/(#1==0 ? 1: #1)}%
                         }
                                 \begin{axis}[x=1cm, y=1cm, axis lines=middle,  
-                                        xlabel=$S_{x_c}(f)$,
-                                        ylabel=$f$,
+                                        xlabel=$f$,
+                                        ylabel=$S_{x_c}(f)$,
                                         x label style={anchor=north west},
                                         y label style={anchor=south east},
                                         xmin=-.1,xmax=8,ymin=-.1,ymax=1.5,
@@ -1579,7 +1576,7 @@ Si aplicamos detección coherente a la parte BPSK, tenemos que usar $A' = A\sqrt
 \begin{equation*}
         P_e = Q\left(A'/\sigma\right) = Q\left(\sqrt{\frac{A^2(1-\mu^2)}{\eta f_s}}\right) = Q\left(\sqrt{2\gamma(1-\mu^2)}\right),
 \end{equation*}
-donde usamos que $\gamma = \bar{E}_p/\eta$ con $\bar{E}_p = A^2/2$, la energía del pulso equivalente en BPSK sin portadora. A continuación una comparación del efecto de $\mu$ para $\gamma = 20$ dB.
+donde usamos que $\gamma = \bar{E}_p/\eta$ con $\bar{E}_p = A^2/2$, la energía del pulso equivalente en BPSK sin portadora. A continuación una comparación del efecto de $\mu$ para $\gamma = 10$ dB.
 \begin{center}
         \input{ej3_5.tikz}
 \end{center}
@@ -1696,11 +1693,100 @@ Un broadcaster tiene un flujo de video de 30 Mbps que se desea transportar via s
 \begin{enumerate}
 \item Indicar el ancho de banda $B$ necesario en el canal pasabanda para este transporte.
 \item Bosquejar la densidad espectral de potencia de la señal modulada.
-\item Proponer un detector coherente para estos pulsos que no introduzca ISI, y deducir la fórmula para la probabilidad de error de detección en base a los parámetros de modulación, en particular la amplitud $A$ de los pulsos recibidos y la densidad espectral de potencia del ruido blanco en el canal. Evaluar para el caso $A=3V$ y $\frac{\eta}{2} = 10^{-4}\unit{\square\volt/\hertz}$.
-\item Luego de realizados los cálculos, el proveedor de espacio satelital avisa que no podr'a ofrecer el ancho de banda $B$, pero si se podrá ofrecer dos espacios de ancho de banda $\frac{B}{2}$. ¿Es posible transmitir los 30 Mbps entre esos dos canales mediante modulación 4QAM en c/u, con el mismo rolloff en
+\item Proponer un detector coherente para estos pulsos que no introduzca ISI, y deducir la fórmula para la probabilidad de error de detección en base a los parámetros de modulación, en particular la amplitud $A$ de los pulsos recibidos y la densidad espectral de potencia del ruido blanco en el canal. Evaluar para el caso $A=3V$ y $\frac{\eta}{2} = 10^{-8}\unit{\square\volt/\hertz}$.
+\item Luego de realizados los cálculos, el proveedor de espacio satelital avisa que no podrá ofrecer el ancho de banda $B$, pero si se podrá ofrecer dos espacios de ancho de banda $\frac{B}{2}$. ¿Es posible transmitir los 30 Mbps entre esos dos canales mediante modulación 4QAM en c/u, con el mismo rolloff en
 los pulsos de Nyquist? Si es así indicar cómo hacerlo.
 \end{enumerate}
 \end{ejercicio}
+
+\begin{solucion}
+
+        \begin{enumerate}
+                \item Necesita enviar $30$ Mbps que corresponden a $15$ MBaudios a $2$ bits por símbolo. La frecuencia de símbolo es entonces $15\unit{\mega\hertz}$.
+                
+                El espectro equivalente en banda base es $S_{x_{ce}} = E[c_k^2]f_s |\hat{P}(f)|^2$, donde en este caso $\hat{P}$ es un pulso de Nyquist con exceso $\alpha=0.2$. Éste tiene un ancho de banda $(1+\alpha)f_s/2$, y al modularlo requiere $(1+\alpha)f_s$ de ancho de banda.
+
+                Por lo tanto, $B=(1.2)f_s = 18 \unit{\mega\hertz}$.
+
+                \item Observando que $E[c_k^2] = 2 A^2$ en $4-$QAM, el espectro equivalente pasabajos tiene ancho de banda $\pm (1+\alpha)f_s/2$ y alto $2A^2 T_s$. Al modularlo la altura queda $A^2 T_s/2$ en cada banda.
+                
+                Bosquejo (para $f>0$):
+                \begin{center}
+                        \begin{tikzpicture}
+                                \begin{axis}[x=1cm, y=1cm, axis lines=middle,  
+                                        xlabel=$f$,
+                                        ylabel=$S_{x_c}(f)$,,
+                                        x label style={anchor=north west},
+                                        y label style={anchor=south east},
+                                        xmin=-.1,xmax=8,ymin=-.1,ymax=1.5,
+                                        xtick={3.6,5,6.4}, ytick=\empty,
+                                        xticklabels={\footnotesize $f_c-\frac{(1+\alpha)f_s}{2}$,\footnotesize $f_c$,\footnotesize  $f_c+\frac{(1+\alpha)f_s}{2}$},
+                                        clip=false,
+                                    ]
+                                \addplot+[solid, mark=none, very thick, teal, domain = (4:6)]  {1} node[midway, above right] {$\frac{1}{2}A^2 T_s$};
+                                \addplot+[solid, mark=none, very thick, teal, domain = (3.6:4), samples=100]  {.5+.5*cos(2*pi*(x-4)/0.8 r)};
+                                \addplot+[solid, mark=none, very thick, teal, domain = (6:6.4), samples=100]  {.5+.5*cos(2*pi*(x-6)/0.8 r)};
+                                \draw[dashed] (axis cs:5,0) -- (axis cs:5,1.5);
+                                \end{axis}
+                        \end{tikzpicture}
+                \end{center}
+
+                \item Se desea un detector que no introduzca ISI, por lo que debe dejarse pasar el pulso completo. El detector es:
+                
+                \begin{center}
+                \begin{tikzpicture}
+                        [node distance=1.5cm,>=stealth, auto,
+                        block/.style={rectangle, minimum size=1cm,draw,thick},
+                        operator/.style={circle,draw, minimum size=5mm, inner sep=0mm, thick},
+                        gain/.style={isosceles triangle,draw,isosceles triangle apex angle=60,thick}]
+
+                \node[anchor=west] (input) at (0,0) {$x_c(t)+n(t)$};
+                \node[coordinate, right of=input] (split) {};
+                \node[operator,  right of=split] (mult1) {$\times$};
+                \node[below of=mult1] (cos) {$2\cos(\omega_ct)$};
+                \node[operator, below of=cos] (mult2) {$\times$};
+                \node[below of=mult2] (sin) {$-2\sin(\omega_ct)$};
+
+                \draw[thick,->] (input) -- (mult1);
+                \draw[thick,->] (split) |- (mult2);
+                \draw[thick,->] (cos) -- (mult1);
+                \draw[thick,->] (sin) -- (mult2);
+
+                \node[block, name=filtroi, right of=mult1] {$\hat{H}(f)$};
+                \node[block, name=filtroq, right of=mult2] {$\hat{H}(f)$};
+                \draw[thick,->] (mult1) -- (filtroi);
+                \draw[thick,->] (mult2) -- (filtroq);
+                
+                \node[coordinate, name=sampleri, right of=filtroi] {};
+                \node[block, name=compi, right of=sampleri, xshift=.5cm] {Comp. $\pm$};
+                \draw[thick,->] (filtroi.east)  -- ($(sampleri) + (-.3,0)$) -- ($ (sampleri) + (.3,.5) $) node[left, xshift=-5] {$t_k$};
+                \draw[thick,->] ($ (sampleri) + (0.3,0) $) -- (compi.west);
+                \node[name=ak, right of = compi, xshift=1cm] (ak) {$a_k$};
+                \draw[thick,->] (compi.east) -- (ak);
+
+                \node[coordinate, name=samplerq, right of=filtroq] {};
+                \node[block, name=compq, right of=samplerq, xshift=.5cm] {Comp. $\pm$};
+                \draw[thick,->] (filtroq.east)  -- ($(samplerq) + (-.3,0)$) -- ($ (samplerq) + (.3,.5) $) node[left, xshift=-5] {$t_k$};
+                \draw[thick,->] ($ (samplerq) + (0.3,0) $) -- (compq.west);
+                \node[name=ak, right of = compq, xshift=1cm] (bk) {$b_k$};
+                \draw[thick,->] (compq.east) -- (bk);
+
+                \end{tikzpicture}
+                \end{center}
+
+                El filtro $\hat{H}(f)$ en recepción es un pasabajos (ideal) de ancho $(1+\alpha)f_s/2$.
+
+                La señal demodulada a la entrada del comparador está intacta, por lo que tendrá amplitud $\pm A$. Queda evaluar la potencia del ruido. La densidad espectral del ruido blanco en banda base es $\eta$ y al pasar por el pasabajos ideal se tiene $\sigma^2 = \eta (1+\alpha)f_s$. La probabilidad de error queda:
+                \begin{equation*}
+                        P_e(a_k) = P_e(b_k) = Q\left(\sqrt{\frac{A^2}{\eta (1+\alpha)f_s}}\right) \Rightarrow P_e \approx 2Q\left(\sqrt{\frac{A^2}{\eta (1+\alpha)f_s}}\right)
+                \end{equation*}
+
+                Para los valores anteriores, $P_e = 2Q(5) = 5.7 \times 10^{-7}$.
+
+                \item Es posible, dividiendo el flujo en dos canales de $15$ Mbps, usando $f_s=7.5 \unit{\mega\hertz}$, usando el exceso $\alpha=0.2$, el canal queda de $B/2=9\unit{\mega\hertz}$ que es lo ofrecido por el operador. El problema es que al dividir, la probabilidad de error aumenta si se mantiene la potencia constante, ya que $f_s$ es la mitad. Dicho de otro modo, se debe aumentar la potencia en $3$ dB.
+        \end{enumerate}
+\end{solucion}
+
 
 \begin{ejercicio}
 Sea un sistema de transmisión digital pasabanda, en donde envía la señal con envolvente compleja
@@ -1739,13 +1825,90 @@ en donde los símbolos complejos $z_k$ son independientes y equiprobables. Se ut
 \end{figure}
 
 \begin{enumerate}
-\item Buscar una codificación de Gray adecuada para el diagrama, hallar $S_z(\varphi)$ y la energía por bit $\bar{E_b}$ .
+\item Buscar una codificación de Gray adecuada para el diagrama, hallar la densidad espectral de potencia en banda base equivalente $S_{ce}(f)$ y la energía por bit $\bar{E_b}$.
 \item Diseñar un diagrama de bloques de un demodulador especificando los umbrales y los filtros utilizados.
 \item Expresar la probabilidad de error en función de A y $\sigma$ para $a_k$ y $b_k $ y dar una aproximación para el error de símbolo. Suponer que se tiene ruido blanco Gaussiano aditivo con varianza $\sigma^2$.
 \item Para $A=6$ y $\sigma=1$, evaluar la probabilidad de error de símbolo y compararla con la probabilidad que se obtiene si se desprecian los errores que se escapan del cuadrante del símbolo.
 \item Expresar la probabilidad anterior en función de $\bar{E_p}$ y $\eta$, donde $\frac{\eta}{2}$ es la densidad espectral del ruido.
-\item Suponiendo que $a_k$ y $b_k$ tienen sus valores en $(2A,\alpha A, -\alpha A, 2A)$, hallar el alfa que hace óptimo la probabilidad de error de símbolo, especificando cual es esta probabilidad.
+\item Suponiendo que $a_k$ y $b_k$ tienen sus valores en $(2A,\alpha A, -\alpha A, 2A)$, hallar el $\alpha$ que hace óptimo la probabilidad de error de símbolo, especificando cual es esta probabilidad.
 \end{enumerate}
 \end{ejercicio}
 
+\begin{solucion}
+        \begin{enumerate}
+                \item Codificación de Gray:
+                \begin{center}
+                        \begin{tikzpicture}
+                                \begin{axis}[x=1.5cm, y=1.5cm, axis lines=middle,  
+                                        xlabel=$a_k$,
+                                        ylabel=$b_k$,
+                                        x label style={anchor=north west},
+                                        y label style={anchor=south east},
+                                        xmin=-2.5,xmax=2.5,ymin=-2.5,ymax=2.5,
+                                        xtick={-2,-1,0,1,2}, ytick={-2,-1,0,1,2},
+                                        xticklabels={$-2A$, $-A$, $0$, $A$, $2A$},
+                                        yticklabels={$-2A$,$-A$, $0$, $A$, $2A$},
+                                        clip=false,
+                                    ]
+                                \addplot+[only marks, teal, mark options={fill=teal}] coordinates {
+                                        (-2,-1) (-2,1) (-2,-2) (-2,2)
+                                        (-1,-1) (-1,1) (-1,-2) (-1,2)
+                                        (1,-1) (1,1) (1,-2) (1,2)
+                                        (2,-1) (2,1) (2,-2) (2,2)
+                                };
+                                \node[below] at (axis cs:-2,-2) { (0000)};
+                                \node[below] at (axis cs:-2,-1) { (0100)};
+                                \node[below] at (axis cs:-1,-2) { (0001)};
+                                \node[below] at (axis cs:-1,-1) { (0101)};
+                                \node[below] at (axis cs:1,-2) { (0011)};
+                                \node[below] at (axis cs:1,-1) { (0111)};
+                                \node[below] at (axis cs:2,-2) { (0010)};
+                                \node[below] at (axis cs:2,-1) { (0110)};
+                                \node[below] at (axis cs:-2,2) { (1000)};
+                                \node[below] at (axis cs:-2,1) { (1100)};
+                                \node[below] at (axis cs:-1,2) { (1001)};
+                                \node[below] at (axis cs:-1,1) { (1101)};
+                                \node[below] at (axis cs:1,2) { (1011)};
+                                \node[below] at (axis cs:1,1) { (1111)};
+                                \node[below] at (axis cs:2,2) { (1010)};
+                                \node[below] at (axis cs:2,1) { (1110)};
+
+                                \end{axis}
+                        \end{tikzpicture}
+                \end{center}
+
+                Para la densidad espectral, observemos que la constelación tiene $\mu=0$ y necesitamos $E[c_k^2]$. Por simetría, lo calculamos en un solo cuadrante, obteniendo $E[c_k^2] = 2A^2(1/4) + 5A^2(1/2) + 8A^2(1/4) = 5A^2$. Por lo tanto:
+                \begin{equation*}
+                        S_{x_{ce}}(f) = 5A^2 T_s \sinc^2(\pi T_s f),
+                \end{equation*}
+                donde se usó la transformada del pulso NRZ.
+
+                La energía media del pulso es $\bar{E}_p = E[c_k^2]||p||^2 = 5A^2T_s$ y la energía por bit es $\bar{E}_b = \bar{E}_p/4 = (5/4)A^2 T_s$.
+
+                \item Se hace detección coherente como en $16$ QAM con filtro acoplado. El único detalle es que los umbrales son $-(3/2)A$, $0$ y $(3/2)A$ porque los símbolos no están equidistantes.
+                
+                \item Calculamos $P_e(a_k)=P_e(b_k)$ en función de $A/\sigma$ observando las distancias. Queda:
+                 \begin{align*}
+                        P_e(a_k) &= \frac{1}{4}\left[Q(A/(2\sigma)) + Q(A/(2\sigma)) + Q(A/\sigma) + Q(A/\sigma) + Q(A/(2\sigma))+ Q(A/(2\sigma))\right] \\
+                        &=Q(A/(2\sigma))+ \frac{1}{2}Q(A/\sigma)
+                 \end{align*}
+                 Por lo tanto, la probabilidad de error total es:
+                 \begin{equation*}
+                        P_e \approx P_e(a_k)+P_e(b_k) = 2Q(A/(2\sigma))+ Q(A/\sigma)
+                 \end{equation*}
+                 
+                 \item Para $(A/\sigma) = 6$ queda $P_e = 0.0026$. El término $Q(A/\sigma)$ que corresponde a cambiarse de cuadrante es despreciable frente al otro. Los errores se dan solo dentro del cuadrante. $P_e \approx 2Q(A/(2\sigma))$.
+
+                 \item Recordando que $\bar{E}_p = 5A^2T_s$ y $\sigma^2=\eta f_s$, se tiene que:
+                  \begin{equation*}
+                        P_e = 2Q\left(\sqrt{\frac{\bar{E}_p}{5\eta}}\right) = 2Q\left(\sqrt{\frac{4\bar{E}_b}{5\eta}}\right)
+                  \end{equation*}
+
+                  \item Lo mejor es poner los símbolos equidistantes, es decir:
+                   \begin{equation*}
+                        (2A-\alpha A) = \alpha A - (-\alpha)A,
+                   \end{equation*}
+                   de donde $\alpha=2/3$. En ese caso, la constelación queda la de QAM-16, pero cambiando $A$ por $2/3 A$, así que $P_e \approx 3Q\left(2A/(3\sigma)\right)$.
+        \end{enumerate}
+\end{solucion}
 \end{document}
