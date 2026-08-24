@@ -1140,7 +1140,7 @@ Sea la onda digital $x_T(t)= \sum_k a_k p_N(t-kT_S)$, con símbolos $a_k \in \{ 
 
         \item Para el sistema de detección anterior, la probabilidad de error de símbolo es:
         \begin{equation*}
-                P_e(\mathrm{sym}) = Q\left(\sqrt{\frac{A}{2\sigma}}\right) + 2Q\left(\sqrt{\frac{A}{2\sigma}}\right) + Q\left(\sqrt{\frac{A}{2\sigma}}\right) = 4Q\left(\sqrt{\frac{A}{2\sigma}}\right)
+                P_e(\mathrm{sym}) = \frac{1}{3}Q\left(\frac{A}{2\sigma}\right) + \frac{1}{3}2Q\left(\frac{A}{2\sigma}\right) + \frac{1}{3} Q\left(\frac{A}{2\sigma}\right) = \frac{4}{3}Q\left(\frac{A}{2\sigma}\right)
         \end{equation*}
 
         Al usar filtro acoplado tenemos que en recepción:
@@ -1150,7 +1150,7 @@ Sea la onda digital $x_T(t)= \sum_k a_k p_N(t-kT_S)$, con símbolos $a_k \in \{ 
 
         De donde la probabilidad de error queda:
         \begin{equation*}
-                P_e(\mathrm{sym}) =  4Q\left(\sqrt{\frac{A^2}{\eta}||p||^2}\right)
+                P_e(\mathrm{sym}) =  \frac{4}{3} Q\left(\sqrt{\frac{A^2}{\eta}||p||^2}\right)
         \end{equation*}
 
         Para completar la expresión, falta calcular la energía del pulso de Nyquist de coseno alzado con exceso $\alpha=0.8$, integrando en frecuencia $\int_{-\infty}^{\infty} |\hat{P}_N(f)|^2df$. Esto da:
@@ -1159,12 +1159,12 @@ Sea la onda digital $x_T(t)= \sum_k a_k p_N(t-kT_S)$, con símbolos $a_k \in \{ 
         \end{equation*}
         Sustituyendo:
         \begin{equation*}
-                P_e(\mathrm{sym}) =  4Q\left(\sqrt{\frac{0.8 A^2}{\eta f_s}}\right)
+                P_e(\mathrm{sym}) =  \frac{4}{3}Q\left(\sqrt{\frac{0.8 A^2}{\eta f_s}}\right)
         \end{equation*}
 
         Para los valores dados, se requiere $\textrm{vti} = 4\times 10^6$ por lo que $f_s = \textrm{vti}/\log_2(3) \approx 2.52 \unit{\mega\hertz}$. Sustituyendo queda:
         \begin{equation*}
-                \sqrt{\frac{0.8 A^2}{\eta f_s}} = 7.55 \Rightarrow P_e = 4Q(7.55) = 8.4 \times 10^{-14}.
+                \sqrt{\frac{0.8 A^2}{\eta f_s}} = 7.55 \Rightarrow P_e = 4Q(7.55) = 2.9 \times 10^{-14}.
         \end{equation*}       
 
 \end{enumerate}
@@ -1402,7 +1402,7 @@ $\gamma:=\frac{\overline{E}_p}{\eta}$.
 
         \item Para el sistema anterior, la probabilidad de error de símbolo es igual a un sistema $4-QAM$ con amplitud $A/\sqrt{2}$. En cada señal usamos $0$ como umbral por lo que la probabilidad de error en $x_1$ o en $x_2$ es $Q(A/(\sqrt{2}\sigma))$ y la probabilidad total es $P_e\approx 2Q(A/(\sqrt{2}\sigma))$.
         
-        Observando que $\bar{E}_p = A^2 T_s$ y $\sigma^2=\eta f_s$, la expresión queda $P_e \approx 2Q\left(\sqrt{\frac{\bar{E}_p}{2\eta}}\right) = 2Q(\sqrt{\gamma/2})$.
+        Observando que $\bar{E}_p = A^2 T_s/2$ y $\sigma^2=\eta f_s$, la expresión queda $P_e \approx 2Q\left(\sqrt{\frac{\bar{E}_p}{\eta}}\right) = 2Q(\sqrt{\gamma})$.
 \end{enumerate}
 \end{solucion}
 
