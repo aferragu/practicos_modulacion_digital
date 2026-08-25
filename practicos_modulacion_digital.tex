@@ -41,6 +41,10 @@
 \usepackage{siunitx}
 \DeclareSIUnit{\baud}{baudios}
 \DeclareMathOperator{\sinc}{sinc}
+\newcommand{\E}[1]{\mathrm{E}\left[#1\right]}
+\newcommand{\p}[1]{\mathrm{P}\left(#1\right)}
+\renewcommand{\phi}{\varphi}
+
 %environment problema
 \newcounter{numejer}[section]
 \newenvironment{ejercicio}[1][]{
@@ -189,8 +193,91 @@ resultante nunca es cero, de donde $r$ tampoco es un mensaje válido (detecta er
 \end{ejercicio}
 
 
-
 \section{Procesos estocásticos}
+
+
+\begin{ejercicio}[Media, autocorrelación y densidad espectral de una fuente iid]
+Una fuente emite símbolos $a_k \in \{-1,0,4\}$ de forma independiente
+entre sí, con
+\[
+\p{a_k=-1}=0.5,\quad \p{a_k=0}=0.3,\quad \p{a_k=4}=0.2.
+\]
+ 
+\begin{enumerate}
+\item Calcular $\mu=\E{a_k}$, $\sigma^2$ y la potencia $P=\E{a_k^2}$.
+\item Escribir $R_a[l]$ para todo $l$, usando que las muestras son
+independientes.
+\item Dar la expresión y bosquejar la densidad espectral de potencia $S_a(\phi)$ de esta fuente.
+\end{enumerate}
+\end{ejercicio}
+ 
+\begin{ejercicio}[Variables en cuadratura]
+Sea el proceso:
+\[
+x(t) = X\cos(2\pi f_0 t) + Y\sin(2\pi f_0 t),
+\]
+con $X$ e $Y$ variables aleatorias independientes entre sí, cada una
+de media $0$ y varianzas $\sigma_X^2$ y $\sigma_y^2$, y $f_0$ una constante conocida.
+ 
+\begin{enumerate}
+\item Calcular $\mu(t) = \E{x(t)}$.
+\item Calcular $R(t,s) = \E{x(t)x(s)}$ y mostrar que depende
+únicamente de $\tau = t-s$. 
+\item ¿Es $x(t)$ WSS? ¿Cuánto vale su potencia $P=R_x(0)$?
+\end{enumerate}
+\end{ejercicio}
+ 
+\begin{ejercicio}[Suma de dos sinusoides de fase aleatoria]
+Sea
+\[
+x(t) = A_1\cos(2\pi f_1 t + \theta_1) + A_2\cos(2\pi f_2 t + \theta_2),
+\]
+con $A_1,A_2,f_1,f_2$ constantes conocidas ($f_1\neq f_2$), y
+$\theta_1,\theta_2$ independientes entre sí, cada una uniforme en
+$[0,2\pi]$.
+ 
+\begin{enumerate}
+\item Calcular $\mu(t) = \E{x(t)}$.
+\item Calcular $R(t,s) = \E{x(t)x(s)}$ utilizando una idea similar a la del caso de una única sinusoide vista en el teórico.
+\item Concluir que $R_x(\tau) = \frac{A_1^2}{2}\cos(2\pi f_1\tau) +
+\frac{A_2^2}{2}\cos(2\pi f_2\tau)$, y que por lo tanto $x(t)$ es WSS.
+¿Cuánto vale su potencia $P=R_x(0)$?
+\item ¿Qué le pasaría a $R_x(\tau)$ si en cambio $\theta_1=\theta_2$
+(la misma variable aleatoria en los dos términos, no dos sorteos
+independientes)? No hace falta rehacer la cuenta completa: alcanza
+con decir qué término de la parte (b) deja de anularse y por qué.
+\end{enumerate}
+\end{ejercicio}
+ 
+\begin{ejercicio}[Filtrado de un proceso WSS]
+Un proceso WSS $x(t)$ de media $\mu_x$ alimenta un sistema LTI con
+respuesta en frecuencia $\hat H(f)$, cuya ganancia de continua es
+$\hat H(0)=G$.
+ 
+\begin{enumerate}
+\item Calcular $\mu_y$ en términos de $\mu_x$ y $G$.
+\item Si en cambio $\mu_x=0$ (por ejemplo, $x(t)$ es ruido), ¿cuánto
+vale $\mu_y$? Explicar por qué este resultado no depende de $G$ ni de
+la forma particular de $\hat H(f)$, sino que es una propiedad general
+de cualquier sistema LTI.
+\item Supongamos ahora que $\hat H(f)$ es un pasabanda ideal de
+ganancia $G$ que anula toda la potencia de $x(t)$ fuera de la banda
+$[-B,B]$. Escribir la potencia de salida $P_y$ en términos de $G$ y de
+la potencia de $x(t)$ contenida en esa banda.
+\end{enumerate}
+\end{ejercicio}
+ 
+\begin{ejercicio}[Ruido blanco filtrado: probabilidad de exceder un umbral]
+Un ruido blanco gaussiano con $\eta_0/2 = 2\times10^{-9}\
+\unit{\watt\per\hertz}$ pasa por un filtro pasabajos ideal de ganancia
+$1$ y ancho de banda $B=1\ \unit{\mega\hertz}$. Sea $n(t)$ la salida.
+ 
+\begin{enumerate}
+\item Calcular la potencia de ruido $N$ a la salida.
+\item Calcular $\p{|n(t)|>3\times10^{-3}}$ en términos de la función
+$Q$, usando la simetría de la distribución Gaussiana.
+\end{enumerate}
+\end{ejercicio}
 
 \section{Modulación en banda base}
 
