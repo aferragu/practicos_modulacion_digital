@@ -51,6 +51,8 @@
 }{
 \bigskip
 }
+\newcommand{\xor}{\oplus}
+\DeclareSIUnit\bps{bps}
 
 \newenvironment{blockdiagram}[1][]{%
 \begin{tikzpicture}[
@@ -81,6 +83,112 @@
 \maketitle
 
 \section{Codificación}
+
+
+\begin{ejercicio}[Codificación de Huffman de una fuente no diádica]
+Una fuente $\{a_k\}$ de símbolos independientes tiene alfabeto $\{A,B,C,D\}$ con probabilidades
+\[
+P(a_k=A)=0.40,\quad P(a_k=B)=0.30,\quad P(a_k=C)=0.20,\quad P(a_k=D)=0.10.
+\]
+ 
+\begin{enumerate}
+\item Calcular la entropía $H(X)$ de la fuente.
+\item Construir el código de Huffman para esta fuente, y a partir de él la tabla de palabras de código y largo por símbolo.
+\item Calcular el largo medio $\bar L = \sum_i p_i \ell_i$ y la eficiencia $\eta = H(X)/\bar L$.
+\item Codificar la secuencia de símbolos
+\[
+A\ \; C\ \; A\ \; B\ \; A\ \; D\ \; A\ \; C
+\]
+usando el código anterior. Comparar el largo de esa cadena con lo que hubiera dado un código de largo fijo de $2$ bits/símbolo para la misma secuencia.
+
+\item Dada la eficiencia, ¿vale la pena codificar en bloques de $N=2$? Justifique.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}[Capacidad de Shannon y WiFi]
+Un enlace WiFi (802.11n) usa un canal de $B=\SI{20}{\mega\hertz}$, y
+en el punto de recepción se mide una relación señal a ruido de
+$\mathrm{SNR}=\SI{22}{\decibel}$ (valor típico en interiores, a
+distancia moderada del access point).
+
+\begin{enumerate}
+\item Calcular la capacidad de Shannon $C$ del enlace (en $\unit{\mega\bps}$).
+\item Expresar el resultado como eficiencia espectral $C/B$ (en \si{\bps/\hertz}).
+\item En la práctica, con esa SNR el estándar logra un throughput real
+de $65 \unit{\mega\bps}$ debido a la implementación del protocolo. Calcular la
+eficiencia espectral real y expresarla como porcentaje de la cota de
+Shannon. Este resultado muestra la dificultad de alcanzar el ideal en sistemas prácticos.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}[Bit de paridad]
+Una fuente binaria $\{a_k\}$ se transmite por un canal que tiene una probabilidad de error de bit (cambiar $0\mapsto 1$ o $1\mapsto 0$) $p=10^{-4}$. Cada bloque de $N$ bits de datos se protege con un único bit de paridad para detección de errores.
+
+\begin{enumerate}
+\item El código detecta un error si y solo si el número de bits invertidos en el bloque es \emph{impar}. Escribir la expresión
+exacta, en función de $N$ y $p$, de la probabilidad de que ocurra un error \emph{no detectado} (es decir, un número par de bits invertidos,
+pero distinto de cero).
+
+\item Argumentar que para $p\ll 1$ esa probabilidad se puede aproximar por
+\[
+P_{\text{no detectado}}(N,p) \approx C^N_2 p^2 = \frac{N(N-1)}{2}p^2.
+\]
+
+\item Calcular la tasa de código y la probabilidad de error no detectado usando la aproximación anterior para el valor dado de $p$ y $N=8,\, 16,\, 32,\,64$ y $128$. Discutir el compromiso entre ambos.
+
+\item Usando la aproximación, estimar el valor máximo de $N$ tal que $P_{\text{no detectado}}<10^{-6}$.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{ejercicio}[Código de Hamming(7,4)]
+
+Con un solo bit de paridad podemos \emph{detectar} un error, pero no sabemos \emph{dónde} ocurrió. La idea de Hamming es usar varios bits de paridad, cada uno cubriendo un subconjunto distinto de posiciones, elegidos de manera tal que la combinación de paridades que falla indique, en binario, la posición exacta del bit erróneo. A continuación se analiza el código Hamming(7,4).
+  
+Definimos primero la matriz $P$ ($4\times 3$):
+\[
+P = \begin{pmatrix}1&1&0\\1&0&1\\0&1&1\\1&1&1\end{pmatrix}
+\]
+y a partir de se definen la matriz generadora $P$ y la matriz de verificación $H$ como:
+\[
+G = \left(I_4\mid P\right) = \begin{pmatrix}
+1&0&0&0&1&1&0\\
+0&1&0&0&1&0&1\\
+0&0&1&0&0&1&1\\
+0&0&0&1&1&1&1
+\end{pmatrix}
+\qquad
+H = \begin{pmatrix}P\\I_3\end{pmatrix} = \begin{pmatrix}
+1&1&0\\1&0&1\\0&1&1\\1&1&1\\1&0&0\\0&1&0\\0&0&1
+\end{pmatrix}.
+\]
+ 
+El algoritmo es entonces:
+\begin{itemize}
+\item \emph{Codificar:} dado un mensaje $m=(m_1,m_2,m_3,m_4)$,
+transmitir el codeword $c=mG$ (de largo $7$) donde el cálculo es en aritmética modúlo 2.
+\item \emph{Decodificar:} el receptor recibe $r$ y calcula el
+síndrome $s=rH$.
+\end{itemize}
+ 
+\begin{enumerate}
+\item Mostrar a partir de $G$ que $c$ es de la forma $(m,d)$ con $d$ 3 bits extras de redundancia.
+
+\item Verificar que $GH = P+P$ y que esta última es la matriz nula. Por lo tanto, si $s=cH=mGH$ se recibe sin error, $s$ es el vector nulo para cualquier mensaje $m$. Esto identifica los mensajes válidos.
+
+\item Sea $c=mG$ ahora un codeword cualquiera, y supongamos que el canal
+invierte únicamente el bit en la posición $i$, dando $r=c+e_i$ (con
+$e_i$ el vector canónico). Verificar que el síndrome resultante $s=rH$ es exactamente la fila $i$ de $H$. Usando que las $7$ filas de $H$ son los $7$ vectores no nulos de $\{0,1\}^3$, concluir que el receptor puede detectar y
+corregir \emph{cualquier} error de un solo bit sin ambigüedad.
+
+\item Supongamos ahora que el canal invierte \emph{dos} bits, en
+posiciones $i\neq j$, dando $r=c+e_i+e_j$. Mostrar que el síndrome
+resultante nunca es cero, de donde $r$ tampoco es un mensaje válido (detecta errores de 2 bits).
+
+\item ¿Qué ocurre si, en el caso anterior, el receptor aplica igual el procedimiento de corrección anterior? Realice un ejemplo.
+\end{enumerate}
+\end{ejercicio}
+
+
 
 \section{Procesos estocásticos}
 
