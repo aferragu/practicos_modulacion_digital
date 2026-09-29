@@ -5,7 +5,7 @@
 \usepackage{amsthm}
 \usepackage{ifthen}
 \usepackage[utf8]{inputenc}
-\usepackage[adobe-utopia]{mathdesign}
+\usepackage{fourier}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
 \usepackage[top=2.5cm,bottom=2.5cm,left=2cm,right=2cm]{geometry}
@@ -491,9 +491,9 @@ Observación: $p(t)$ puede escribirse como la convolución de dos pulsos de anch
                             ]
                         \addplot+ [mark=none, solid,very thick, teal, domain=(-3.5:3.5), samples=100] {sinc(pi*x/2)^4} node[midway,above right] {\small $\frac{A^2}{16}T_s$};
                         \draw[very thick, -stealth, teal] (axis cs:0,0) -- (axis cs:0,1) node[midway,right] {\small $\frac{A^2}{16}$};
-                        \draw[very thick, -stealth, teal] (axis cs:1,0) -- (axis cs:1,.16) node[midway,above right] {\small $\frac{A^2}{4\pi^2}$};
+                        \draw[very thick, -stealth, teal] (axis cs:1,0) -- (axis cs:1,.164) node[midway,above right] {\small $\frac{A^2}{\pi^4}$};
                         \draw[very thick, -stealth, teal] (axis cs:3,0) -- (axis cs:3,0.05);
-                        \draw[very thick, -stealth, teal] (axis cs:-1,0) -- (axis cs:-1,.16) node[midway,above left] {\small $\frac{A^2}{4\pi^2}$};
+                        \draw[very thick, -stealth, teal] (axis cs:-1,0) -- (axis cs:-1,.164) node[midway,above left] {\small $\frac{A^2}{\pi^4}$};
                         \draw[very thick, -stealth, teal] (axis cs:-3,0) -- (axis cs:-3,0.05);
                         \end{axis}
                 \end{tikzpicture}
@@ -534,7 +534,7 @@ Observación: $p(t)$ puede escribirse como la convolución de dos pulsos de anch
         \end{itemize}
         La expresión completa es:
         \begin{equation*}
-                S_x(f) = \frac{A^2}{4}T_s \sinc^4\left(\pi\frac{f}{f_s}\right) + \frac{A^2}{4} \delta(0).
+                S_x(f) = \frac{A^2}{4}T_s \sinc^4\left(\pi\frac{f}{f_s}\right) + \frac{A^2}{4} \delta(f).
         \end{equation*}
 
         \begin{center}
