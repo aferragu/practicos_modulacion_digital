@@ -1446,7 +1446,7 @@ amplificadores:
 
 \section{Modulación digital pasabanda}
 
-\begin{ejercicio}
+\begin{ejercicio}\label{ej:bpsk}
 Un sistema de señalización binaria BPSK trasmite información a una velocidad de $2.5 \unit{\mega\bit/\second}$. El ruido en el canal es blanco y gaussiano de densidad espectral de potencia $\eta_0/2=10^{-20}\unit{\square\volt/\hertz}$. La amplitud de la señal a la entrada del detector es $A=1\unit{\micro\volt}$. Asumiendo que se trata de detección coherente con filtro acoplado, determinar la probabilidad de error de bit.
 \end{ejercicio}
 
@@ -1457,12 +1457,79 @@ Un sistema de señalización binaria BPSK trasmite información a una velocidad 
         \end{equation*}
 \end{solucion}
 
-\begin{ejercicio}
-En la detección BPSK coherente, investigar el efecto de un error de fase $\theta$ entre el oscilador local y la portadora. Hallar la expresión para la probabilidad de error de detección en función de $\theta$ y de $\gamma=\bar E_b/\eta_0$. ¿Cuántos $\unit{\decibel}$ de energía de bit adicional se necesitan para compensar un error de fase de $20^\circ$? ¿Qué pasa si $\theta=\pi$?
+\begin{ejercicio}[Ruido en fase y cuadratura]
+Con los datos del Ejercicio~\ref{ej:bpsk} (pulsos NRZ, $f_s=2.5\ \unit{\mega\baud}$), el receptor tiene primero un filtro pasabanda ideal de ancho $2f_s$ centrado en $f_c$, y luego los mezcladores con $2\cos(2\pi f_c t)$ y $-2\sin(2\pi f_c t)$, seguidos de filtros pasabajos ideales de ancho $f_s$. Suponer que los filtros dejan pasar la señal sin modificar apreciablemente su potencia.
+\begin{enumerate}
+\item Calcular la potencia del ruido pasabanda $n(t)$ a la salida del primer filtro y la relación señal a ruido a la entrada de los mezcladores.
+\item Usando el resultado de las notas sobre el ruido demodulado, dar la densidad espectral de $n_i(t)$ y $n_q(t)$ y su potencia a la salida de los pasabajos. Verificar que la potencia de $n(t)$ es el promedio de las potencias de $n_i(t)$ y $n_q(t)$.
+\item Calcular la relación señal a ruido en la rama en fase y compararla con la de la parte 1. ¿De dónde sale la diferencia? ¿Qué hay en la rama en cuadratura?
+\item Repetir las partes 1 y 3 para una señal $4$-QAM con la misma amplitud $A$ en cada rama, $a_k,b_k\in\{-A,A\}$. ¿Se mantiene la ganancia de la parte 3? ¿Qué se gana a cambio?
+\item Comparar la relación señal a ruido de la parte 3 con la relación $(A/\sigma)^2$ a la salida del filtro acoplado, y recuperar el resultado del Ejercicio~\ref{ej:bpsk}. ¿De dónde sale la diferencia?
+\end{enumerate}
 \end{ejercicio}
 
 \begin{solucion}
-Recordemos el diagrama de detección coherente BPSK, pero introduciendo un error de fase en el demodulador:
+Tenemos $A=1\ \unit{\micro\volt}$, $\eta_0=2\times10^{-20}\ \unit{\square\volt/\hertz}$ y $f_s=2.5\times10^6\ \unit{\baud}$.
+\begin{enumerate}
+\item El filtro deja pasar el ruido en dos bandas de ancho $2f_s$, alrededor de $\pm f_c$, con densidad $\eta_0/2$:
+\begin{equation*}
+N=\frac{\eta_0}{2}\cdot 2\cdot 2f_s=2\eta_0f_s=10^{-13}\ \unit{\square\volt}.
+\end{equation*}
+La señal BPSK, $x_c(t)=\sum_ka_kp(t-kT_s)\cos(2\pi f_ct)$, tiene potencia $\frac{A^2}{2}=5\times10^{-13}\ \unit{\square\volt}$, de donde $\mathrm{SNR}_{\text{pb}}=5$, es decir $7\ \unit{\decibel}$.
+\item Escribiendo $n(t)=n_i(t)\cos(2\pi f_ct)-n_q(t)\sin(2\pi f_ct)$, la proposición de las notas dice que $n_i$ y $n_q$ son independientes y tienen densidad espectral $\eta_0$ en $|f|\leqslant f_s$ (la mitad del ancho del pasabanda). Sus potencias son entonces $P_{n_i}=P_{n_q}=\eta_0\cdot2f_s=10^{-13}\ \unit{\square\volt}$. Como $\cos^2$ y $\sin^2$ tienen valor medio $\frac12$ y $n_i$, $n_q$ son independientes,
+\begin{equation*}
+P_n=\frac{P_{n_i}+P_{n_q}}{2}=10^{-13}\ \unit{\square\volt},
+\end{equation*}
+que coincide con la parte 1.
+\item En la rama en fase se tiene $\sum_ka_kp(t-kT_s)+n_i(t)$. La señal tiene potencia $A^2=10^{-12}\ \unit{\square\volt}$ (el factor $2$ del oscilador recupera la amplitud $A$) y el ruido $10^{-13}\ \unit{\square\volt}$, por lo que $\mathrm{SNR}_i=10$, es decir $10\ \unit{\decibel}$: $3\ \unit{\decibel}$ mejor que la pasabanda.
+
+El factor $2$ del oscilador no explica la diferencia, porque multiplica por igual a la señal y al ruido. La diferencia se debe a que la potencia del ruido pasabanda se reparte por igual entre $n_i$ y $n_q$, mientras que toda la potencia de la señal BPSK está en fase. En la rama en cuadratura hay \emph{solo ruido}, $n_q(t)$, y el detector coherente lo descarta. Ese es el origen de los $3\ \unit{\decibel}$.
+\item Para $4$-QAM la potencia de la señal pasabanda es $\frac{\E{a_k^2}+\E{b_k^2}}{2}=A^2=10^{-12}\ \unit{\square\volt}$, por lo que $\mathrm{SNR}_{\text{pb}}=10$ ($10\ \unit{\decibel}$). En cada rama se tiene una señal de potencia $A^2$ con ruido de potencia $10^{-13}\ \unit{\square\volt}$: $\mathrm{SNR}_i=\mathrm{SNR}_q=10$. Ahora no hay ganancia respecto de la SNR pasabanda, porque la rama en cuadratura también lleva señal y no se descarta nada.
+
+A cambio, se transmiten $2$ bits por símbolo en el mismo ancho de banda. Como cada rama es un BPSK con la misma amplitud y el mismo ruido, la probabilidad de error de bit es la misma que en BPSK, con el doble de tasa (y el doble de potencia, es decir la misma energía por bit). BPSK desperdicia la dimensión en cuadratura; $4$-QAM la usa.
+\item A la salida del filtro acoplado normalizado, $\sigma^2=\eta_0\|h\|^2=\eta_0f_s=5\times10^{-14}\ \unit{\square\volt}$, y $(A/\sigma)^2=20$ ($13\ \unit{\decibel}$), de donde $P_e=Q(\sqrt{20})\approx3.9\times10^{-6}$, como en el Ejercicio~\ref{ej:bpsk}.
+
+La diferencia de $3\ \unit{\decibel}$ con la parte 3 se debe al ancho de banda equivalente de ruido. El pasabajos ideal de ancho $f_s$ deja pasar el ruido en $2f_s$ (frecuencias positivas y negativas), mientras que para el integrador $\int|\hat H(f)|^2df=\int\sinc^2(\pi fT_s)\,df=f_s$, la mitad. El filtro acoplado deja pasar menos ruido conservando el valor de la muestra.
+\end{enumerate}
+\end{solucion}
+
+\begin{ejercicio}[Envolvente compleja, error de fase y error de frecuencia]
+Se transmite una señal $4$-QAM,
+\begin{equation*}
+x_c(t)=\sum_k \left[a_k\cos(2\pi f_c t)-b_k\sin(2\pi f_c t)\right]p(t-kT_s),\qquad a_k,b_k\in\{-A,A\},
+\end{equation*}
+con pulsos de raíz de coseno alzado con $\alpha=0.25$, velocidad de señalización $f_s=4000\ \unit{\baud}$ y portadora $f_c=16\ \unit{\kilo\hertz}$. El receptor es el detector coherente con filtros acoplados, y el canal agrega ruido blanco gaussiano de densidad espectral $\eta_0/2$.
+\begin{enumerate}
+\item Escribir la envolvente compleja $x_{ce}(t)$ y verificar que $x_c(t)=\mathrm{Re}\left[x_{ce}(t)\e^{j2\pi f_c t}\right]$. ¿Qué banda de frecuencias ocupa $x_c(t)$?
+\item \emph{Error de fase.} Los osciladores locales del receptor son $2\cos(2\pi f_c t+\theta)$ y $-2\sin(2\pi f_c t+\theta)$. Mostrar que, a la salida de los pasabajos, la envolvente compleja demodulada es $x_{ce}(t)\e^{-j\theta}$, es decir, la constelación aparece rotada un ángulo $-\theta$. ¿Cambia la potencia del ruido demodulado?
+\item Para el caso BPSK ($b_k=0$), hallar la probabilidad de error en función de $\theta$ y de $\gamma=\bar E_b/\eta_0$. ¿Cuántos $\unit{\decibel}$ de energía de bit adicional se necesitan para compensar un error de fase de $20^\circ$? ¿Qué pasa si $\theta=\pi$?
+\item Para el caso $4$-QAM, mostrar que la muestra de la rama en fase es $a_k\cos\theta+b_k\sin\theta$ (más ruido): las dos ramas se mezclan. Hallar la probabilidad de error de la rama en fase en función de $\theta$ y $\gamma$, y la penalización en $\unit{\decibel}$ del peor caso para $\theta=20^\circ$. Comparar con BPSK. ¿A partir de qué $\theta$ el detector se equivoca aun sin ruido?
+\item \emph{Error de frecuencia.} Si los osciladores locales están en $f_c+\Delta f$, mostrar que la envolvente compleja demodulada es $x_{ce}(t)\e^{-j2\pi\Delta f\,t}$. Para $\Delta f=10\ \unit{\hertz}$, ¿cuántos grados gira la constelación en cada símbolo? ¿Cada cuánto tiempo da una vuelta completa? Despreciando el ruido, ¿a partir de qué símbolo se equivoca el detector en BPSK y en $4$-QAM? ¿Qué mecanismo resuelve este problema?
+\item En el caso anterior, $\Delta f$ es $625$ ppm de la portadora. Una radio real a $2.4\ \unit{\giga\hertz}$ usa en cada extremo osciladores de cristal con una precisión de $\pm 20$ ppm. Calcular el máximo $\Delta f$ y cuántas vueltas giraría la constelación en cada símbolo a $4000\ \unit{\baud}$. Comparar $\Delta f$ con el ancho de banda de la señal: ¿qué se obtiene a la salida del filtro acoplado? ¿Alcanza con el mecanismo de la parte anterior?
+\end{enumerate}
+\end{ejercicio}
+
+\begin{solucion}
+\begin{enumerate}
+\item $x_{ce}(t)=\sum_k(a_k+jb_k)\,p(t-kT_s)$. En efecto,
+\begin{equation*}
+\mathrm{Re}\left[(a_k+jb_k)\left(\cos(2\pi f_ct)+j\sin(2\pi f_ct)\right)\right]=a_k\cos(2\pi f_ct)-b_k\sin(2\pi f_ct).
+\end{equation*}
+El espectro del pulso de raíz de coseno alzado está contenido en $|f|\leqslant\frac{(1+\alpha)f_s}{2}=2.5\ \unit{\kilo\hertz}$, por lo que $x_c(t)$ ocupa la banda de $13.5$ a $18.5\ \unit{\kilo\hertz}$: $5\ \unit{\kilo\hertz}$ centrados en $f_c$.
+
+\item Las dos ramas del receptor forman la señal compleja
+\begin{equation*}
+z(t)=x_c(t)\left[2\cos(2\pi f_ct+\theta)-j2\sin(2\pi f_ct+\theta)\right]=2x_c(t)\e^{-j(2\pi f_ct+\theta)}.
+\end{equation*}
+Como $x_c=\frac12\left(x_{ce}\e^{j2\pi f_ct}+\overline{x_{ce}}\e^{-j2\pi f_ct}\right)$,
+\begin{equation*}
+z(t)=x_{ce}(t)\e^{-j\theta}+\overline{x_{ce}(t)}\e^{-j(4\pi f_ct+\theta)},
+\end{equation*}
+y los pasabajos eliminan el segundo término, centrado en $-2f_c$. Queda $x_{ce}(t)\e^{-j\theta}$: cada símbolo $a_k+jb_k$ aparece multiplicado por $\e^{-j\theta}$, es decir rotado un ángulo $-\theta$.
+
+Con el ruido ocurre lo mismo: se obtiene $(n_i+jn_q)\e^{-j\theta}$, cuya parte real es $n_i\cos\theta+n_q\sin\theta$. Como $n_i$ y $n_q$ son independientes y de igual densidad $\eta_0$, esta combinación tiene densidad $\eta_0(\cos^2\theta+\sin^2\theta)=\eta_0$. El error de fase no cambia el ruido; solo rota la señal.
+
+\item Para BPSK basta con la rama en fase:
 
 \begin{blockdiagram}[decoration={brace,amplitude=10}]
         \matrix[row sep=5 mm, column sep=8mm, ampersand replacement=\&]{
@@ -1481,32 +1548,66 @@ Recordemos el diagrama de detección coherente BPSK, pero introduciendo un error
         \draw [-stealth] (p4) -- (comp);
         %\draw [decorate]  (filtro.south east) --node [below=3mm] {\parbox{3cm}{filtro acop. a NRZ, integra en un período de símb.}} (filtro.south west);
     \end{blockdiagram}
-    
-    con $x_c(t) = \sum_k a_k p(t-kT_s) \cos(\omega_c t)$. Emulando el análisis para detección coherente:
-    \begin{align*}
-        x_o(t)  &= [x_c(t)+n(t)]2\cos(\omega_c t + \theta) \\
-                &= [x_c(t) + n_i(t)\cos(\omega_c t) - n_q(t)\sin(\omega_c t)]2\cos(\omega_c t + \theta)
-    \end{align*}
-    Aplicando las identidades trigonométricas adecuadas para los términos producto, tendremos:
-    \begin{equation*}
-        x_o(t) = \sum_k a_k p(t-kT_s) \cos(\theta) + n_i(t)\cos(\theta) + n_q(t)\sin(\theta) + \ldots
-    \end{equation*}
-    donde los puntos representan términos de alta frecuencia que se irán luego de filtrar y ya los despreciamos.
-    
-    Como los ruidos $n_i(t)$ y $n_q(t)$ son independientes, la combinación lineal dará un ruido $n_b(t)$ en banda base de densidad espectral $\eta_0\cos^2(\theta) + \eta_0 \sin^2(\theta) = \eta_0$, por lo que la potencia del ruido no cambia por el error de fase.
 
-    En cambio, la amplitud del símbolo $a_k$ se ve atenuada por un factor $\cos(\theta)$ que depende del error. Si utilizamos el filtro acoplado, lograremos:
-    \begin{equation*}
-        \left( \frac{A'}{\sigma}\right)^2_{\max} = \frac{A^2 \cos^2(\theta)}{\eta_0}||p||^2 = \frac{A^2 \cos^2(\theta)}{\eta_0 f_s},
-    \end{equation*}
-    de donde, usando $\bar E_b=A^2T_s/2$ (BPSK),
-    \begin{equation*}
-        P_e=Q\left(\frac{A'}{\sigma}\right) = Q\left(\sqrt{\frac{A^2 \cos^2(\theta)}{\eta_0 f_s}}\right)=Q\left(\sqrt{2\gamma}\,\cos\theta\right).
-    \end{equation*}
-    El error de fase equivale a perder un factor $\cos^2\theta$ de energía: para $\theta=20^\circ$ hay que aumentar $\bar E_b$ en $-20\log_{10}\cos 20^\circ\approx 0.54\ \unit{\decibel}$.
+con $x_c(t)=\sum_ka_kp(t-kT_s)\cos(2\pi f_ct)$. Por la parte anterior, la salida de la rama en fase es $\sum_ka_kp(t-kT_s)\cos\theta+n_i(t)\cos\theta+n_q(t)\sin\theta$, con ruido de densidad $\eta_0$. La amplitud del símbolo queda multiplicada por $\cos\theta$, y con el filtro acoplado
+\begin{equation*}
+\left(\frac{A\cos\theta}{\sigma}\right)^2_{\max}=\frac{A^2\cos^2\theta}{\eta_0}\|p\|^2=2\gamma\cos^2\theta,
+\end{equation*}
+usando $\bar E_b=A^2\|p\|^2/2$. Entonces
+\begin{equation*}
+P_e=Q\left(\sqrt{2\gamma}\,\cos\theta\right).
+\end{equation*}
+El error de fase equivale a perder un factor $\cos^2\theta$ de energía: para $\theta=20^\circ$ hay que aumentar $\bar E_b$ en $-20\log_{10}\cos20^\circ\approx0.54\ \unit{\decibel}$.
 
-    En particular, si $\theta = \pm \pi/2$ estoy completamente fuera de fase y solo queda el ruido, pierdo completamente información cruzada del símbolo (prob. de error $\to 1/2$). Si en cambio $\theta>\pi/2$ tenemos inversión de símbolos, porque cambia el signo de $\cos(\theta)$. En el caso extremo de $\theta=\pi$ (medio ciclo), $P_e=1-Q(\sqrt{2\gamma})\approx 1$: decodificamos todo el mensaje al revés. Es la ambigüedad de fase que dejan abierta el lazo cuadrático y el lazo de Costas (capítulo de sincronización).
+Si $\theta=\pm\pi/2$, la rama en fase solo tiene ruido y $P_e=1/2$. Si $|\theta|>\pi/2$, $\cos\theta$ cambia de signo y los símbolos se invierten. En el caso extremo $\theta=\pi$, $P_e=1-Q(\sqrt{2\gamma})\approx1$: se decodifica todo el mensaje al revés. Es la ambigüedad de fase que dejan abierta el lazo cuadrático y el lazo de Costas (capítulo de sincronización).
 
+\item $(a_k+jb_k)\e^{-j\theta}=(a_k\cos\theta+b_k\sin\theta)+j(b_k\cos\theta-a_k\sin\theta)$. La muestra de la rama en fase es $a_k\cos\theta+b_k\sin\theta$ más ruido: además de atenuarse, recibe la interferencia de la otra rama.
+
+Para $0\leqslant\theta<\pi/4$ y $a_k=A$, la muestra sin ruido vale $A(\cos\theta+\sin\theta)$ si $b_k=A$ y $A(\cos\theta-\sin\theta)$ si $b_k=-A$, con igual probabilidad (el caso $a_k=-A$ es simétrico). Para $4$-QAM cada rama tiene $(A/\sigma)^2=2\gamma$, igual que BPSK, por lo que
+\begin{equation*}
+P_e(a_k)=\frac12Q\left(\sqrt{2\gamma}\,(\cos\theta-\sin\theta)\right)+\frac12Q\left(\sqrt{2\gamma}\,(\cos\theta+\sin\theta)\right).
+\end{equation*}
+Para $\gamma$ grande domina el primer término, y el peor caso pierde un factor $(\cos\theta-\sin\theta)^2$ de energía. Para $\theta=20^\circ$, $\cos20^\circ-\sin20^\circ\approx0.598$, es decir $-20\log_{10}0.598\approx4.5\ \unit{\decibel}$, contra $0.54\ \unit{\decibel}$ en BPSK. $4$-QAM es mucho más sensible al error de fase: los puntos de la constelación están a $45^\circ$ de los bordes de las regiones de decisión, y no a $90^\circ$ como en BPSK.
+
+Para $\theta\geqslant45^\circ$, $\cos\theta-\sin\theta\leqslant0$ y el detector se equivoca aun sin ruido.
+
+\item Repitiendo la parte 2 con $2\cos(2\pi(f_c+\Delta f)t)$, es decir con $\theta=2\pi\Delta f\,t$, la envolvente demodulada es $x_{ce}(t)\e^{-j2\pi\Delta f\,t}$: la constelación gira continuamente con velocidad angular $2\pi\Delta f$.
+
+En cada símbolo gira $360^\circ\cdot\Delta f\,T_s=360^\circ\cdot10/4000=0.9^\circ$, y da una vuelta completa cada $1/\Delta f=0.1\ \unit{\second}$, es decir cada $400$ símbolos. (El giro dentro de un mismo símbolo es despreciable, por lo que el filtro acoplado sigue funcionando bien en cada símbolo.)
+
+Sin ruido, BPSK se equivoca cuando el giro supera $90^\circ$, a partir del símbolo $100$ ($25\ \unit{\milli\second}$). A partir de allí decodifica invertido durante $200$ símbolos, vuelve a acertar, y así sucesivamente: la amplitud en fase oscila como $A\cos(2\pi\Delta f\,t)$. $4$-QAM se equivoca cuando el giro supera $45^\circ$, a partir del símbolo $50$ ($12.5\ \unit{\milli\second}$). Antes, ya en el símbolo $22$ el giro es de $20^\circ$ y, por la parte anterior, se pierden $4.5\ \unit{\decibel}$ de margen.
+
+El problema se resuelve con la sincronización de portadora: un PLL (con un detector de fase apropiado, como el lazo de Costas) que ajusta continuamente la fase del oscilador local. Para seguir un error de frecuencia sin error de fase en régimen se necesita un lazo de segundo orden.
+
+\item $\Delta f_{\max}=2\times20\times10^{-6}\times2.4\times10^9=96\ \unit{\kilo\hertz}$ (los dos osciladores se apartan en sentidos opuestos). A $4000\ \unit{\baud}$, eso es $96000/4000=24$ vueltas por símbolo.
+
+La envolvente demodulada queda desplazada $96\ \unit{\kilo\hertz}$ en frecuencia, mientras que el filtro acoplado deja pasar solo $|f|\leqslant2.5\ \unit{\kilo\hertz}$. La señal cae completamente fuera de la banda del filtro, y a su salida solo hay ruido. Ya no se trata de una constelación que gira lentamente: no hay constelación.
+
+El PLL no alcanza, porque necesita que la señal esté presente a la salida de los filtros para medir la fase, y porque su rango de enganche es mucho menor que $96\ \unit{\kilo\hertz}$. Antes hay que estimar y corregir groseramente la frecuencia (por ejemplo, a partir de un preámbulo conocido o buscando la portadora en el espectro), y dejar al PLL solo el error residual. En el ejemplo de la parte anterior, $625$ ppm a $16\ \unit{\kilo\hertz}$ son solo $10\ \unit{\hertz}$; el problema real aparece porque el error en ppm se multiplica por una portadora de $\unit{\giga\hertz}$ mientras que la velocidad de señalización sigue siendo baja.
+\end{enumerate}
+\end{solucion}
+
+\begin{ejercicio}[OOK frente a BPSK]
+Se comparan dos sistemas binarios con pulsos NRZ, la misma velocidad de señalización y ruido blanco gaussiano de densidad espectral $\eta_0/2$: OOK, con $a_k\in\{0,A\}$, y BPSK, con $a_k\in\{-A',A'\}$, ambos con detección coherente y filtro acoplado.
+\begin{enumerate}
+\item A partir del espectro de OOK visto en las notas, calcular la potencia media de la señal de RF y la fracción de esa potencia que está en la componente discreta en $f_c$ (la portadora). Repetir para BPSK.
+\item Hallar para cada sistema el valor de $\gamma=\bar E_b/\eta_0$, en $\unit{\decibel}$, necesario para una probabilidad de error de bit de $10^{-6}$. Interpretar la diferencia a partir del resultado de la parte anterior.
+\item ¿Cuánto debe valer $A'$ en función de $A$ para que los dos sistemas tengan la misma potencia media? ¿Y para que tengan la misma probabilidad de error?
+\item La portadora de OOK, ¿puede aprovecharse directamente para sincronizar el oscilador local del receptor? ¿Y en BPSK? Mencionar una ventaja práctica de OOK que justifique su uso en aplicaciones sencillas, como los controles remotos.
+\end{enumerate}
+\end{ejercicio}
+
+\begin{solucion}
+\begin{enumerate}
+\item De las notas, la onda equivalente en banda base de OOK tiene $S_x(f)=\frac{A^2T_s}{4}\sinc^2(\pi T_sf)+\frac{A^2}{4}\delta(f)$, y la de RF es $S_{x_c}(f)=\frac14\left[S_x(f-f_c)+S_x(f+f_c)\right]$. En cada una de las dos bandas hay una parte continua de potencia $\frac{A^2}{16}$ y una delta de peso $\frac{A^2}{16}$. La potencia total es $4\cdot\frac{A^2}{16}=\frac{A^2}{4}$ (que coincide con $\E{a_k^2}/2$), y las dos deltas suman $\frac{A^2}{8}$: la portadora se lleva el $50\%$ de la potencia.
+
+Para BPSK, $\mu_a=0$: no hay componente discreta, y toda la potencia, $\frac{A'^2}{2}$, está en la parte continua, que es la que lleva la información.
+\item De las notas, $P_e^{\text{OOK}}=Q(\sqrt{\gamma})$ y $P_e^{\text{BPSK}}=Q(\sqrt{2\gamma})$. Con $Q^{-1}(10^{-6})\approx4.75$ se obtiene $\gamma\approx22.6$ ($13.5\ \unit{\decibel}$) para OOK y $\gamma\approx11.3$ ($10.5\ \unit{\decibel}$) para BPSK.
+
+Los $3\ \unit{\decibel}$ de diferencia son exactamente la mitad de la potencia que OOK pone en la portadora, que no transporta información. Dicho de otro modo: si a la señal OOK se le restara su media $A/2$, quedaría una señal BPSK de amplitud $A/2$, con la misma distancia $A$ entre símbolos y la mitad de la potencia.
+\item Igual potencia: $\frac{A'^2}{2}=\frac{A^2}{4}$, es decir $A'=A/\sqrt2$. Igual probabilidad de error: igual distancia entre símbolos, $2A'=A$, es decir $A'=A/2$, con la mitad de la potencia.
+\item Sí: la componente discreta en $f_c$ puede extraerse con un filtro angosto o seguirse directamente con un PLL. BPSK es de portadora suprimida, y necesita un lazo cuadrático o de Costas (capítulo de sincronización). La ventaja práctica de OOK es que puede detectarse de forma \emph{no coherente}, con un detector de envolvente, sin oscilador local ni sincronismo de portadora, y que el transmisor solo debe encender y apagar un oscilador. Ambas cosas abaratan mucho el equipo, a cambio de los $3\ \unit{\decibel}$ (y algo más con detección no coherente).
+\end{enumerate}
 \end{solucion}
 
 \begin{ejercicio}
@@ -1574,8 +1675,10 @@ media de los pulsos de RF.
 \item Evaluar numéricamente la curva $P_e(\gamma_s)$ de la parte anterior, y comparar con
 la correspondiente a modulación 8PSK. ¿Cuál es mejor? ¿Por cuántos $\unit{\decibel}$, para $P_e=10^{-5}$?
 \item Comparar también con la curva para una transmisión de banda
-base polar, con $M=8$ símbolos. ?`Es justa esta comparación en
+base polar, con $M=8$ símbolos. ¿Es justa esta comparación en
 términos de eficiencia espectral?
+\item Repetir la comparación entre QAM y PSK para $M=64$ ($64$-QAM cuadrada frente a $64$-PSK), usando las fórmulas de tasa de error de bit de las notas: hallar el valor de $\gamma=\bar E_b/\eta_0$, en $\unit{\decibel}$, necesario para una tasa de error de bit de $10^{-6}$ en cada caso. ¿Qué se concluye sobre el uso de PSK para $M$ grande?
+\item Un enlace debe transportar $36\ \unit{\mega\bps}$ en un canal pasabanda de $8\ \unit{\mega\hertz}$, con pulsos de coseno alzado con $\alpha=0.25$. Verificar que $M=64$ es el menor tamaño de constelación posible (potencia de $2$). Si en el receptor $\eta_0/2=2\times10^{-21}\ \unit{\watt/\hertz}$, calcular la potencia recibida necesaria, en $\mathrm{dBm}$, con $64$-QAM y con $64$-PSK. (Sugerencia: $S=\bar E_bR_b$.)
 \end{enumerate}
 \end{ejercicio}
 
@@ -1700,6 +1803,20 @@ términos de eficiencia espectral?
                         \input{ej3_4b.tikz}
                 \end{center}
                 La comparación no es justa en términos de eficiencia espectral: con pulsos de Nyquist, la señal de banda base ocupa $f_s/2$, mientras que la pasabanda ocupa $f_s$ alrededor de $f_c$. Con el mismo ancho de banda, la constelación de banda base transmite el doble de bits por segundo. A igual eficiencia espectral habría que comparar la $8$-PAM con una constelación pasabanda de $64$ puntos.
+
+                \item Con las fórmulas de las notas,
+                \begin{equation*}
+                        \mathrm{BER}_{\text{QAM}}=\frac{4}{6}\cdot\frac78\,Q\left(\sqrt{\frac{18}{63}\gamma}\right),\qquad \mathrm{BER}_{\text{PSK}}=\frac26\,Q\left(\sqrt{12\sin^2(\pi/64)\,\gamma}\right),
+                \end{equation*}
+                y resolviendo numéricamente $\mathrm{BER}=10^{-6}$ se obtiene $\gamma\approx18.8\ \unit{\decibel}$ para $64$-QAM y $\gamma\approx28.5\ \unit{\decibel}$ para $64$-PSK (ver también la figura de comparación de las notas). La diferencia, casi $10\ \unit{\decibel}$, contrasta con el medio $\unit{\decibel}$ de $M=8$: en PSK todos los puntos están sobre una circunferencia y su distancia mínima cae como $\sin(\pi/M)$, mientras que QAM aprovecha el interior del plano. Para $M$ grande PSK no se usa; su ventaja es la envolvente constante, que importa cuando el amplificador no es lineal.
+                \item La señal pasabanda ocupa $(1+\alpha)f_s$, por lo que $f_s\leqslant8/1.25=6.4\ \unit{\mega\baud}$, y se necesitan $\log_2M\geqslant36/6.4=5.6$ bits por símbolo: $M=64$, con $f_s=6\ \unit{\mega\baud}$ y un ancho de banda ocupado de $7.5\ \unit{\mega\hertz}$.
+
+                Con $\eta_0=4\times10^{-21}\ \unit{\watt/\hertz}$ (aproximadamente $kT_0$ a temperatura ambiente), $S=\gamma\,\eta_0R_b$:
+                \begin{itemize}
+                        \item $64$-QAM: $S\approx10^{1.88}\times4\times10^{-21}\times36\times10^6\approx1.1\times10^{-11}\ \unit{\watt}$, es decir $-79.6\ \mathrm{dBm}$.
+                        \item $64$-PSK: $S\approx1.0\times10^{-10}\ \unit{\watt}$, es decir $-69.9\ \mathrm{dBm}$.
+                \end{itemize}
+                Con PSK haría falta casi diez veces más potencia recibida para el mismo enlace.
         \end{enumerate}
 \end{solucion}
 
@@ -2069,6 +2186,195 @@ en donde los símbolos complejos $z_k$ son independientes y equiprobables. Se ut
 
                    Además, la energía baja: $\E{a_k^2}=\frac{4+4/9}{2}A^2=\frac{20}{9}A^2$ frente a $\frac52A^2$, es decir $0.5\ \unit{\decibel}$ menos. La constelación equiespaciada es mejor en margen \emph{y} en energía.
         \end{enumerate}
+\end{solucion}
+
+\section{Propagación en medios guiados}
+
+\begin{ejercicio}[Parámetros de un cable coaxil]
+Un cable coaxil para TV y cable tiene parámetros primarios $L=294\ \unit{\nano\henry/\meter}$, $C=52.3\ \unit{\pico\farad/\meter}$, $R=0.04\ \unit{\ohm/\meter}$ (supuesta constante) y $G\approx 0$.
+\begin{enumerate}
+\item Calcular la impedancia característica y la velocidad de propagación de la línea sin pérdidas. Expresar la velocidad como fracción de la velocidad de la luz.
+\item Calcular exactamente $\gamma(f)$ y $Z_0(f)$ para $f=1\ \unit{\kilo\hertz}$, $100\ \unit{\kilo\hertz}$ y $10\ \unit{\mega\hertz}$. ¿A partir de qué frecuencia es válida la aproximación de bajas pérdidas? Comparar $\alpha(f)$ con $R/(2Z_0)$.
+\item Expresar la atenuación en $\unit{\decibel}$ cada $100\ \unit{\meter}$, y calcular la velocidad de fase en las tres frecuencias. ¿Qué ocurre con la velocidad de fase a $1\ \unit{\kilo\hertz}$?
+\item Explicar por qué, en el régimen de bajas pérdidas, este modelo con $R$ constante no predice distorsión de los pulsos, y qué fenómeno físico hay que agregar para explicar la ISI que produce un cable real.
+\end{enumerate}
+\end{ejercicio}
+\begin{solucion}
+\begin{enumerate}
+\item $Z_0=\sqrt{L/C}=\sqrt{294\times10^{-9}/52.3\times10^{-12}}\approx75\ \unit{\ohm}$ y $v_p=1/\sqrt{LC}\approx2.55\times10^8\ \unit{\meter/\second}$, es decir $0.85c$ (dieléctrico de espuma).
+\item[2. y 3.] Calculando $\gamma=\sqrt{(R+j2\pi fL)(j2\pi fC)}$ y $Z_0=(R+j2\pi fL)/\gamma$:
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c}
+$f$ & $2\pi fL$ ($\unit{\ohm/\meter}$) & $\gamma$ ($\unit{\per\meter}$) & $Z_0$ ($\unit{\ohm}$) & $\alpha$ ($\unit{\decibel}/100\ \unit{\meter}$) & $v_p$\\ \hline
+$1\ \unit{\kilo\hertz}$ & $0.0018$ & $7.9\times10^{-5}+j8.3\times10^{-5}$ & $252-j241$ & $0.07$ & $0.25c$\\
+$100\ \unit{\kilo\hertz}$ & $0.18$ & $2.65\times10^{-4}+j2.48\times10^{-3}$ & $75.4-j8.1$ & $0.23$ & $0.85c$\\
+$10\ \unit{\mega\hertz}$ & $18.5$ & $2.67\times10^{-4}+j0.246$ & $75.0-j0.1$ & $0.23$ & $0.85c$
+\end{tabular}
+\end{center}
+La aproximación de bajas pérdidas exige $R\ll2\pi fL$, es decir $f\gg R/(2\pi L)\approx22\ \unit{\kilo\hertz}$. A $100\ \unit{\kilo\hertz}$ ya vale razonablemente, y a $10\ \unit{\mega\hertz}$ muy bien: en ambos casos $\alpha\approx R/(2Z_0)=2.67\times10^{-4}\ \unit{\neper/\meter}$, es decir $0.23\ \unit{\decibel}$ cada $100\ \unit{\meter}$, independiente de la frecuencia. A $1\ \unit{\kilo\hertz}$ no vale: $Z_0$ es fuertemente complejo y la velocidad de fase cae a menos de un tercio. A bajas frecuencias la línea se comporta como una red $RC$ distribuida, con $\alpha\approx\beta\approx\sqrt{\pi fRC}$, y es dispersiva.
+\item[4.] Con $R$ y $G$ constantes, en el régimen de bajas pérdidas $\alpha$ es constante y $\beta=2\pi f/v_p$ es lineal en $f$: la línea solo atenúa y retarda, sin distorsionar. La ISI de un cable real proviene del efecto pelicular: $R$ crece como $\sqrt f$, lo que hace crecer $\alpha$ con la frecuencia y agrega una fase no lineal.
+\end{enumerate}
+\end{solucion}
+
+
+\begin{ejercicio}[Bobinas de carga en un par telefónico]
+Un par telefónico tiene $R=170\ \unit{\ohm/\kilo\meter}$, $L=0.6\ \unit{\milli\henry/\kilo\meter}$, $C=50\ \unit{\nano\farad/\kilo\meter}$ y $G\approx 0$.
+\begin{enumerate}
+\item Verificar que en la banda de voz ($300$ a $3000\ \unit{\hertz}$) el par \emph{no} está en el régimen de bajas pérdidas. Mostrar que en ese caso $\gamma(f)\approx\sqrt{j2\pi f RC}$, y por lo tanto $\alpha(f)\approx\sqrt{\pi f RC}$. Calcular $\alpha$ en $\unit{\decibel/\kilo\meter}$ a $300$, $1000$ y $3000\ \unit{\hertz}$, y comentar la distorsión que produce.
+\item Se intercalan bobinas de $88\ \unit{\milli\henry}$ cada $1830\ \unit{\meter}$. Calcular la inductancia efectiva por unidad de longitud y determinar a partir de qué frecuencia vale ahora la aproximación de bajas pérdidas. Calcular $Z_0$ y $\alpha$ en la banda de voz (con la aproximación y en forma exacta) y comparar con la parte anterior.
+\item La cadena de bobinas y la capacidad de cada tramo forman una escalera $LC$ pasabajos, con frecuencia de corte $f_{\max}\approx 1/(\pi\sqrt{L_b C_t})$, siendo $L_b$ la inductancia de cada bobina y $C_t$ la capacidad de cada tramo. Estimar $f_{\max}$ y explicar por qué fue necesario retirar las bobinas para ofrecer ADSL.
+\end{enumerate}
+\end{ejercicio}
+\begin{solucion}
+\begin{enumerate}
+\item $2\pi fL=1.1$, $3.8$ y $11.3\ \unit{\ohm/\kilo\meter}$ a $300$, $1000$ y $3000\ \unit{\hertz}$, mucho menores que $R=170\ \unit{\ohm/\kilo\meter}$. Despreciando $j2\pi fL$ frente a $R$, $\gamma\approx\sqrt{j2\pi fRC}=\sqrt{2\pi fRC}\,\e^{j\pi/4}$, de donde $\alpha=\beta=\sqrt{\pi fRC}$. Esto da $0.78$, $1.42$ y $2.46\ \unit{\decibel/\kilo\meter}$ (el cálculo exacto da $0.77$, $1.40$ y $2.38$). La atenuación se triplica dentro de la banda de voz, y además $v_p=2\pi f/\beta\propto\sqrt f$: el par sin carga distorsiona tanto en amplitud como en fase.
+\item $L_{\text{ef}}=0.6+88/1.83\approx48.7\ \unit{\milli\henry/\kilo\meter}$. Ahora $R=2\pi fL_{\text{ef}}$ para $f\approx560\ \unit{\hertz}$, y $2\pi fL_{\text{ef}}=306$ y $918\ \unit{\ohm/\kilo\meter}$ a $1$ y $3\ \unit{\kilo\hertz}$: la aproximación de bajas pérdidas vale razonablemente a partir de $1\ \unit{\kilo\hertz}$ (y no a $300\ \unit{\hertz}$). Allí $Z_0\approx\sqrt{L_{\text{ef}}/C}\approx990\ \unit{\ohm}$ y $\alpha\approx R/(2Z_0)\approx0.75\ \unit{\decibel/\kilo\meter}$. El cálculo exacto da $\alpha=0.60$, $0.72$ y $0.75\ \unit{\decibel/\kilo\meter}$ y $|Z_0|=1430$, $1055$ y $995\ \unit{\ohm}$. La atenuación a $1\ \unit{\kilo\hertz}$ se reduce a la mitad (el alcance para el mismo presupuesto en $\unit{\decibel}$ se duplica) y, sobre todo, varía poco dentro de la banda de voz.
+\item $C_t=50\ \unit{\nano\farad/\kilo\meter}\times1.83\ \unit{\kilo\meter}\approx91.5\ \unit{\nano\farad}$, y
+\begin{equation*}
+f_{\max}\approx\frac{1}{\pi\sqrt{0.088\times91.5\times10^{-9}}}\approx3.5\ \unit{\kilo\hertz}.
+\end{equation*}
+Por encima de esa frecuencia la escalera prácticamente no deja pasar señal, y ADSL usa frecuencias de hasta $1.1\ \unit{\mega\hertz}$.
+\end{enumerate}
+\end{solucion}
+
+
+\begin{ejercicio}[Reflexión, ROE y potencia entregada]
+Una línea sin pérdidas de $Z_0=50\ \unit{\ohm}$ es alimentada por un generador sinusoidal adaptado ($Z_G=Z_0$).
+\begin{enumerate}
+\item Para las cargas $Z_L=75\ \unit{\ohm}$, $10\ \unit{\ohm}$, $30-j40\ \unit{\ohm}$ y $j50\ \unit{\ohm}$, calcular $\Gamma_L$, la ROE, la \emph{pérdida de retorno} $-20\log_{10}|\Gamma_L|$ y la fracción de la potencia incidente que se entrega a la carga. Ubicar las cuatro cargas en la Carta de Smith.
+\item Para cada carga, hallar la distancia desde la carga al primer mínimo de la onda estacionaria de tensión.
+\item Mostrar que, con el generador adaptado, la potencia entregada a la carga es $(1-|\Gamma_L|^2)$ veces la potencia disponible del generador.
+\item Sobre una línea de $50\ \unit{\ohm}$ con una carga desconocida se mide una ROE de $3$, y el primer mínimo de tensión a $\lambda/8$ de la carga. Hallar $Z_L$, analíticamente y usando la Carta de Smith.
+\item Para la carga de $10\ \unit{\ohm}$, diseñar un transformador de cuarto de onda. ¿Por qué no puede usarse directamente para la carga $30-j40\ \unit{\ohm}$? ¿Cómo podría usarse igual, intercalando antes un tramo de línea?
+\item En la simulación de un pulso enviado por una línea \emph{con pérdidas}, con generador adaptado, la carga recibe el $67.7\%$ de la energía disponible cuando $Z_L=Z_0$, y el $44.6\%$ cuando $Z_L=4Z_0$. Explicar ambos números: ¿dónde está el $32\%$ que falta en el primer caso? ¿Por qué el cociente entre ambos es aproximadamente $0.64$?
+\end{enumerate}
+\end{ejercicio}
+\begin{solucion}
+\begin{enumerate}
+\item Con $\zeta_L=Z_L/Z_0$ y $\Gamma_L=\frac{\zeta_L-1}{\zeta_L+1}$:
+\begin{center}
+\begin{tabular}{c|c|c|c|c}
+$Z_L$ ($\unit{\ohm}$) & $\Gamma_L$ & ROE & pérdida de retorno & $1-|\Gamma_L|^2$\\ \hline
+$75$ & $0.2$ & $1.5$ & $14\ \unit{\decibel}$ & $96\%$\\
+$10$ & $-2/3$ & $5$ & $3.5\ \unit{\decibel}$ & $56\%$\\
+$30-j40$ & $-j0.5$ & $3$ & $6\ \unit{\decibel}$ & $75\%$\\
+$j50$ & $j$ & $\infty$ & $0\ \unit{\decibel}$ & $0\%$
+\end{tabular}
+\end{center}
+En la carta, las dos cargas resistivas están sobre el eje real ($75\ \unit{\ohm}$ a la derecha del centro, $10\ \unit{\ohm}$ a la izquierda), $30-j40$ en el semiplano inferior (capacitivo), sobre el eje imaginario, y $j50$ sobre la circunferencia exterior, en el punto $\Gamma=j$ (reactancia pura).
+\item A distancia $d$ de la carga, $\Gamma(d)=\Gamma_L\e^{-j4\pi d/\lambda}$, y el mínimo de tensión está donde $\Gamma(d)=-|\Gamma_L|$. Si $\Gamma_L=|\Gamma_L|\e^{j\theta_L}$, se necesita $\theta_L-4\pi d/\lambda=-\pi$ (módulo $2\pi$), es decir $d_{\min}=\frac{\theta_L+\pi}{4\pi}\lambda$, módulo $\lambda/2$. Resulta $\lambda/4$ para $75\ \unit{\ohm}$ ($\theta_L=0$), $0$ para $10\ \unit{\ohm}$ (el mínimo está en la carga), $\lambda/8$ para $30-j40\ \unit{\ohm}$ ($\theta_L=-\pi/2$) y $3\lambda/8$ para $j50\ \unit{\ohm}$ ($\theta_L=\pi/2$). En la carta, es lo que hay que girar en sentido horario hasta el semieje real negativo.
+\item Con $Z_G=Z_0$, la onda incidente tiene amplitud $V^+=V_s\frac{Z_0}{Z_0+Z_G}=\frac{V_s}{2}$ y potencia $\frac{|V^+|^2}{2Z_0}=\frac{|V_s|^2}{8Z_0}$, que es la potencia disponible de un generador de impedancia interna $Z_0$. La onda reflejada lleva una fracción $|\Gamma_L|^2$ de esa potencia, y el generador adaptado la absorbe sin volver a reflejarla, por lo que la carga recibe $(1-|\Gamma_L|^2)P_{\text{disp}}$.
+\item $|\Gamma_L|=\frac{\mathrm{ROE}-1}{\mathrm{ROE}+1}=0.5$. En el mínimo, $\Gamma(\lambda/8)=\Gamma_L\e^{-j\pi/2}=-0.5$, de donde $\Gamma_L=-0.5\,\e^{j\pi/2}=-j0.5$ y
+\begin{equation*}
+Z_L=Z_0\frac{1+\Gamma_L}{1-\Gamma_L}=50\,\frac{1-j0.5}{1+j0.5}=30-j40\ \unit{\ohm},
+\end{equation*}
+que es una de las cargas de la parte 1. En la carta: se traza la circunferencia de ROE $3$, se ubica el mínimo en el semieje real negativo ($\zeta=1/3$), y se gira $\lambda/8$ en sentido antihorario (hacia la carga) hasta $\zeta_L=0.6-j0.8$.
+\item $Z_0'=\sqrt{50\times10}\approx22.4\ \unit{\ohm}$, en un tramo de longitud $\lambda/4$. Para una carga compleja, el tramo de $\lambda/4$ da $Z_0'^2/Z_L$, que también es complejo, y no puede igualar a $50\ \unit{\ohm}$ con ningún $Z_0'$ real. Pero a distancia $d_{\min}=\lambda/8$ la impedancia vista es real, $Z_0/\mathrm{ROE}\approx16.7\ \unit{\ohm}$: intercalando primero $\lambda/8$ de la línea de $50\ \unit{\ohm}$ y luego un transformador de $\lambda/4$ con $Z_0'=\sqrt{50\times16.7}\approx28.9\ \unit{\ohm}$, la línea queda adaptada.
+\item Con $Z_L=Z_0$ no hay reflexión: el $32\%$ que falta se disipó en la línea, que atenúa el pulso. Con $Z_L=4Z_0$, $\Gamma_L=0.6$, y de la energía que llega la carga toma $1-0.36=0.64$: $0.677\times0.64\approx0.433$, cerca del $44.6\%$ simulado. La pequeña diferencia se debe a que en la línea con pérdidas $Z_0(f)$ es complejo y depende de la frecuencia, por lo que $\Gamma_L(f)$ no es exactamente $0.6$ en toda la banda del pulso.
+\end{enumerate}
+\end{solucion}
+
+
+\begin{ejercicio}[Adaptación con stub]
+Sobre una línea sin pérdidas de $Z_0=50\ \unit{\ohm}$ se conecta una carga $Z_L=20-j30\ \unit{\ohm}$.
+\begin{enumerate}
+\item Calcular $\Gamma_L$ y la ROE. Ubicar la carga en la Carta de Smith.
+\item Usando la carta como carta de admitancias, hallar las dos distancias $d$ a la carga en las que puede conectarse un stub cortocircuitado en paralelo, y la susceptancia que debe aportar en cada caso.
+\item Hallar las longitudes $\ell_s$ de los stubs correspondientes, y verificar analíticamente ambas soluciones.
+\item ¿Cuál de las dos soluciones es preferible, y por qué?
+\end{enumerate}
+\end{ejercicio}
+\begin{solucion}
+\begin{enumerate}
+\item $\zeta_L=0.4-j0.6$, $\Gamma_L=\frac{\zeta_L-1}{\zeta_L+1}\approx-0.207-j0.517$, $|\Gamma_L|\approx0.557$ y $\mathrm{ROE}\approx3.52$. En la carta, la carga está en el semiplano inferior (capacitiva), sobre el círculo de ROE $3.52$.
+\item La admitancia es $y_L=1/\zeta_L\approx0.77+j1.15$, el punto diametralmente opuesto en la carta. Girando en sentido horario (hacia el generador) sobre el círculo de ROE se corta la circunferencia $g=1$ en dos puntos: $y=1+j1.34$ a $d_1\approx0.017\lambda$ y $y=1-j1.34$ a $d_2\approx0.173\lambda$. El stub debe aportar $-j1.34$ en el primer caso y $+j1.34$ en el segundo.
+\item Con $y_{cc}=-j\cot(\beta\ell_s)$: para $-j1.34$, $\cot(\beta\ell_s)=1.34$, $\beta\ell_s\approx0.640\ \unit{\radian}$ y $\ell_s\approx0.102\lambda$; para $+j1.34$, $\beta\ell_s\approx\pi-0.640$ y $\ell_s\approx0.398\lambda$. Verificación: con
+\begin{equation*}
+y(d)=\frac{y_L+j\tan(\beta d)}{1+jy_L\tan(\beta d)}
+\end{equation*}
+se obtiene $y(0.0167\lambda)\approx1.00+j1.34$ y $y(0.1727\lambda)\approx1.00-j1.34$.
+\item La primera: el stub y la distancia a la carga son más cortos, por lo que la adaptación es menos sensible a la frecuencia (cuanto más largos los tramos, más rápido cambian sus fases con $f$), y la onda estacionaria queda confinada a un tramo más corto. En la práctica puede ser difícil conectar el stub a solo $0.017\lambda$ de la carga, y entonces se usa la segunda.
+\end{enumerate}
+\end{solucion}
+
+
+\begin{ejercicio}[Diseño de una adaptación con stub y ancho de banda]
+Una carga se modela como una resistencia de $100\ \unit{\ohm}$ en paralelo con una capacidad de $20\ \unit{\pico\farad}$. Se la quiere conectar, a $f_0=100\ \unit{\mega\hertz}$, a un cable coaxil de $Z_0=50\ \unit{\ohm}$ con velocidad de propagación $v_p=2\times10^8\ \unit{\meter/\second}$, sin pérdidas.
+\begin{enumerate}
+\item Calcular la admitancia normalizada de la carga a $f_0$, $\Gamma_L$ y la ROE sin adaptar.
+\item Hallar las dos soluciones de adaptación con un stub en paralelo, y dar la distancia $d$ y la longitud del stub \emph{en centímetros}, tanto para un stub cortocircuitado como para uno en circuito abierto. ¿Cuál es la combinación más corta?
+\item Para la primera solución con stub cortocircuitado, calcular la ROE vista desde el cable a $90$, $95$, $105$ y $110\ \unit{\mega\hertz}$, teniendo en cuenta que cambian tanto las longitudes eléctricas $\beta d$ y $\beta\ell_s$ como la admitancia de la carga. Estimar la banda de frecuencias en la que la ROE se mantiene por debajo de $1.5$.
+\end{enumerate}
+\end{ejercicio}
+\begin{solucion}
+\begin{enumerate}
+\item A $f_0$, $Y_L=\frac{1}{100}+j2\pi f_0\,20\times10^{-12}=0.01+j0.0126\ \unit{\siemens}$, y $y_L=Z_0Y_L=0.5+j0.628$. Entonces $Z_L=1/Y_L\approx38.8-j48.7\ \unit{\ohm}$, $\Gamma_L\approx0.134-j0.475$, $|\Gamma_L|\approx0.494$ y $\mathrm{ROE}\approx2.95$.
+\item $\lambda=v_p/f_0=2\ \unit{\meter}$. Girando $y_L$ hacia el generador sobre el círculo de ROE $2.95$:
+\begin{itemize}
+\item $d_1\approx0.063\lambda=12.6\ \unit{\centi\meter}$, con $y(d_1)=1+j1.14$. El stub debe aportar $-j1.14$: cortocircuitado, $\cot(\beta\ell_s)=1.14$, $\ell_s\approx0.115\lambda=23.0\ \unit{\centi\meter}$; en circuito abierto, $y_{ca}=j\tan(\beta\ell_s)=-j1.14$, $\ell_s\approx0.365\lambda=73.0\ \unit{\centi\meter}$.
+\item $d_2\approx0.231\lambda=46.2\ \unit{\centi\meter}$, con $y(d_2)=1-j1.14$. El stub debe aportar $+j1.14$: cortocircuitado, $\ell_s\approx0.385\lambda=77.0\ \unit{\centi\meter}$; en circuito abierto, $\ell_s\approx0.135\lambda=27.0\ \unit{\centi\meter}$.
+\end{itemize}
+La combinación más corta es la primera con stub cortocircuitado: $12.6+23.0\ \unit{\centi\meter}$. Para cada distancia, uno de los dos tipos de stub es corto ($<\lambda/4$) y el otro largo: los dos difieren en $\lambda/4$.
+\item Con $d=12.6\ \unit{\centi\meter}$ y $\ell_s=23.0\ \unit{\centi\meter}$ fijos, a cada frecuencia se recalcula $\beta=2\pi f/v_p$, la admitancia de la carga $Y_L(f)$, la admitancia $y(d)$ vista en el punto de conexión, y se le suma $y_{cc}(\ell_s)=-j\cot(\beta\ell_s)$. La ROE vista desde el cable resulta:
+\begin{center}
+\begin{tabular}{c|ccccc}
+$f$ ($\unit{\mega\hertz}$) & $90$ & $95$ & $100$ & $105$ & $110$\\ \hline
+ROE & $1.47$ & $1.20$ & $1.00$ & $1.19$ & $1.40$
+\end{tabular}
+\end{center}
+La ROE se mantiene por debajo de $1.5$ aproximadamente entre $89.5$ y $112\ \unit{\mega\hertz}$, una banda de unos $23\ \unit{\mega\hertz}$ ($23\%$ de $f_0$). La adaptación con stub es exacta en una sola frecuencia y se degrada al alejarse de ella.
+\end{enumerate}
+\end{solucion}
+
+
+\begin{ejercicio}[Efecto pelicular y presupuesto de pérdidas]
+Un par trenzado de conductores de cobre AWG24 (radio $a=0.26\ \unit{\milli\meter}$) tiene una atenuación de $3.81\ \unit{\decibel}$ cada $100\ \unit{\meter}$ a $10\ \unit{\mega\hertz}$, dominada por el efecto pelicular. Para el cobre, $\sigma=5.96\times10^7\ \unit{\siemens/\meter}$ y $\mu=4\pi\times10^{-7}\ \unit{\henry/\meter}$.
+\begin{enumerate}
+\item Calcular la profundidad de penetración en $50\ \unit{\hertz}$, $1\ \unit{\mega\hertz}$ y $100\ \unit{\mega\hertz}$. ¿A qué frecuencia es igual al radio del conductor? ¿Qué significa que esté por debajo o por encima de esa frecuencia?
+\item Calcular la atenuación cada $100\ \unit{\meter}$ a $2.5$, $31.25$ y $100\ \unit{\mega\hertz}$.
+\item Si cada tramo tolera una atenuación de $20\ \unit{\decibel}$, evaluada a la velocidad de señalización, calcular la separación entre repetidores para $f_s=10\ \unit{\mega\baud}$ y para $f_s=40\ \unit{\mega\baud}$. ¿Qué habría pasado si la atenuación creciera proporcionalmente a $f$?
+\item A partir de la respuesta en frecuencia del cable de las notas, calcular el producto $k\ell$ para $100\ \unit{\meter}$ y el retardo de grupo adicional $\tau_g(f)-t_d$ a $1$ y $10\ \unit{\mega\hertz}$. Repetir para $1\ \unit{\kilo\meter}$ y comparar la diferencia con el tiempo de símbolo para $f_s=10\ \unit{\mega\baud}$.
+\end{enumerate}
+\end{ejercicio}
+\begin{solucion}
+\begin{enumerate}
+\item $\delta=1/\sqrt{\pi f\mu\sigma}$ da $9.2\ \unit{\milli\meter}$ a $50\ \unit{\hertz}$, $65\ \unit{\micro\meter}$ a $1\ \unit{\mega\hertz}$ y $6.5\ \unit{\micro\meter}$ a $100\ \unit{\mega\hertz}$. Es igual al radio, $\delta=a$, para $f=1/(\pi\mu\sigma a^2)\approx63\ \unit{\kilo\hertz}$. Por debajo de esa frecuencia la corriente ocupa toda la sección del conductor y la resistencia es la de continua. Por encima, la corriente se concentra en una corona de espesor $\delta$, la sección efectiva disminuye como $1/\sqrt f$ y $R$ crece como $\sqrt f$. Por eso la resistencia de un cable de energía a $50\ \unit{\hertz}$ no depende de la frecuencia, y la de un cable de datos sí.
+\item $\alpha(f)=3.81\sqrt{f/10\ \unit{\mega\hertz}}$: $1.9$, $6.7$ y $12.0\ \unit{\decibel}$ cada $100\ \unit{\meter}$.
+\item $\ell=20/3.81\times100\approx525\ \unit{\meter}$ a $10\ \unit{\mega\baud}$, y $262\ \unit{\meter}$ a $40\ \unit{\mega\baud}$: cuadruplicar la velocidad reduce la distancia a la mitad. Si la atenuación fuera proporcional a $f$, se reduciría a la cuarta parte, $131\ \unit{\meter}$.
+\item $\alpha(f)\ell=k\ell\sqrt f$ en neper: $k\ell=\frac{3.81/8.686}{\sqrt{10^7}}\approx1.39\times10^{-4}\ \unit{\second^{1/2}}$ para $100\ \unit{\meter}$. Entonces
+\begin{equation*}
+\tau_g(f)-t_d=\frac{k\ell}{4\pi\sqrt f}\approx11.0\ \unit{\nano\second}\ \text{a}\ 1\ \unit{\mega\hertz},\qquad 3.5\ \unit{\nano\second}\ \text{a}\ 10\ \unit{\mega\hertz}.
+\end{equation*}
+Para $1\ \unit{\kilo\meter}$ los valores se multiplican por $10$: $110$ y $35\ \unit{\nano\second}$. La diferencia, unos $75\ \unit{\nano\second}$, es comparable al tiempo de símbolo de $100\ \unit{\nano\second}$, por lo que la cola del pulso se extiende sobre los símbolos siguientes y hace falta ecualizar.
+\end{enumerate}
+\end{solucion}
+
+
+\begin{ejercicio}[Ecualizador de cero forzado]
+Al medir la respuesta de un canal a un pulso aislado se obtienen las muestras $\tilde p_{-1}=0.1$, $\tilde p_0=1$, $\tilde p_1=0.3$, $\tilde p_2=0.1$, y $\tilde p_m\approx 0$ para el resto.
+\begin{enumerate}
+\item Calcular la ISI máxima (peor caso) para una señal binaria polar $\pm A$, en relación con $A$.
+\item Diseñar un ecualizador de cero forzado de tres coeficientes. Calcular las muestras del pulso ecualizado $\hat p_k$ para $k=-3,\ldots,4$ y la nueva ISI máxima.
+\item Si el ruido a la entrada del ecualizador está formado por muestras independientes de varianza $\sigma^2$, ¿cuál es su varianza a la salida? Expresar el aumento en $\unit{\decibel}$.
+\end{enumerate}
+\end{ejercicio}
+\begin{solucion}
+\begin{enumerate}
+\item La ISI de peor caso es $A\sum_{m\neq0}|\tilde p_m|=0.5A$: el ojo queda abierto a la mitad.
+\item El sistema de las notas, con $N=1$, es
+\begin{equation*}
+\begin{pmatrix}1&0.1&0\\0.3&1&0.1\\0.1&0.3&1\end{pmatrix}\begin{pmatrix}c_{-1}\\c_0\\c_1\end{pmatrix}=\begin{pmatrix}0\\1\\0\end{pmatrix},
+\end{equation*}
+de solución $c_{-1}\approx-0.106$, $c_0\approx1.063$, $c_1\approx-0.308$. El pulso ecualizado $\hat p_k=\sum_nc_n\tilde p_{k-n}$ vale
+\begin{center}
+\begin{tabular}{c|cccccccc}
+$k$ & $-3$ & $-2$ & $-1$ & $0$ & $1$ & $2$ & $3$ & $4$\\ \hline
+$\hat p_k$ & $0$ & $-0.011$ & $0$ & $1$ & $0$ & $0.014$ & $-0.031$ & $0$
+\end{tabular}
+\end{center}
+Los ceros en $k=\pm1$ son los que impone el diseño; fuera de esa ventana quedan residuos pequeños. La ISI de peor caso baja de $0.5A$ a $0.055A$.
+\item La salida del ecualizador es $\sum_nc_n(\ldots+n_{k-n})$, y como las muestras de ruido son independientes, la varianza es $\sigma^2\sum_nc_n^2\approx1.24\,\sigma^2$, es decir $0.9\ \unit{\decibel}$ más de ruido. Es el precio de reducir la ISI diez veces.
+\end{enumerate}
 \end{solucion}
 
 \end{document}
