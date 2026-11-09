@@ -42,13 +42,15 @@
 \DeclareSIUnit{\baud}{baudios}
 \DeclareMathOperator{\sinc}{sinc}
 \newcommand{\E}[1]{\mathrm{E}\left[#1\right]}
+\newcommand{\e}{\mathrm{e}}
 \newcommand{\p}[1]{\mathrm{P}\left(#1\right)}
 \renewcommand{\phi}{\varphi}
 
 %environment problema
 \newcounter{numejer}[section]
+\renewcommand{\thenumejer}{\arabic{section}.\arabic{numejer}}
 \newenvironment{ejercicio}[1][]{
-\addtocounter{numejer}{1} 
+\refstepcounter{numejer}
 \noindent \large \textbf{Ejercicio \arabic{section}.\arabic{numejer}} \ifthenelse{\equal{#1}{}}{}{\emph{(#1)}}
 
 \smallskip
@@ -109,7 +111,7 @@ usando el código anterior. Comparar el largo de esa cadena con lo que hubiera d
 \end{enumerate}
 \end{ejercicio}
 
-\begin{ejercicio}[Capacidad de Shannon y WiFi]
+\begin{ejercicio}[Capacidad de Shannon y WiFi]\label{ej:wifi shannon}
 Un enlace WiFi (802.11n) usa un canal de $B=\SI{20}{\mega\hertz}$, y
 en el punto de recepción se mide una relación señal a ruido de
 $\mathrm{SNR}=\SI{22}{\decibel}$ (valor típico en interiores, a
@@ -118,27 +120,27 @@ distancia moderada del access point).
 \begin{enumerate}
 \item Calcular la capacidad de Shannon $C$ del enlace (en $\unit{\mega\bps}$).
 \item Expresar el resultado como eficiencia espectral $C/B$ (en \si{\bps/\hertz}).
-\item En la práctica, con esa SNR el estándar logra un throughput real
-de $65 \unit{\mega\bps}$ debido a la implementación del protocolo. Calcular la
+\item En la práctica, con esa SNR el estándar puede operar con una tasa de bits de capa física
+de $65 \unit{\mega\bps}$ (modulación 64-QAM con un código corrector de tasa $5/6$). Calcular la
 eficiencia espectral real y expresarla como porcentaje de la cota de
 Shannon. Este resultado muestra la dificultad de alcanzar el ideal en sistemas prácticos.
 \end{enumerate}
 \end{ejercicio}
 
 \begin{ejercicio}[Bit de paridad]
-Una fuente binaria $\{a_k\}$ se transmite por un canal que tiene una probabilidad de error de bit (cambiar $0\mapsto 1$ o $1\mapsto 0$) $p=10^{-4}$. Cada bloque de $N$ bits de datos se protege con un único bit de paridad para detección de errores.
+Una fuente binaria $\{a_k\}$ se transmite por un canal que tiene una probabilidad de error de bit (cambiar $0\mapsto 1$ o $1\mapsto 0$) $p=10^{-4}$. Cada bloque de $N$ bits de datos se protege con un único bit de paridad para detección de errores, por lo que se transmiten bloques de $N+1$ bits.
 
 \begin{enumerate}
-\item El código detecta un error si y solo si el número de bits invertidos en el bloque es \emph{impar}. Escribir la expresión
+\item El código detecta un error si y solo si el número de bits invertidos en el bloque transmitido es \emph{impar}. Escribir la expresión
 exacta, en función de $N$ y $p$, de la probabilidad de que ocurra un error \emph{no detectado} (es decir, un número par de bits invertidos,
 pero distinto de cero).
 
 \item Argumentar que para $p\ll 1$ esa probabilidad se puede aproximar por
 \[
-P_{\text{no detectado}}(N,p) \approx C^N_2 p^2 = \frac{N(N-1)}{2}p^2.
+P_{\text{no detectado}}(N,p) \approx C^{N+1}_2 p^2 = \frac{(N+1)N}{2}p^2.
 \]
 
-\item Calcular la tasa de código y la probabilidad de error no detectado usando la aproximación anterior para el valor dado de $p$ y $N=8,\, 16,\, 32,\,64$ y $128$. Discutir el compromiso entre ambos.
+\item Calcular la tasa de código $N/(N+1)$ y la probabilidad de error no detectado usando la aproximación anterior para el valor dado de $p$ y $N=8,\, 16,\, 32,\,64$ y $128$. Discutir el compromiso entre ambos.
 
 \item Usando la aproximación, estimar el valor máximo de $N$ tal que $P_{\text{no detectado}}<10^{-6}$.
 \end{enumerate}
@@ -146,13 +148,13 @@ P_{\text{no detectado}}(N,p) \approx C^N_2 p^2 = \frac{N(N-1)}{2}p^2.
 
 \begin{ejercicio}[Código de Hamming(7,4)]
 
-Con un solo bit de paridad podemos \emph{detectar} un error, pero no sabemos \emph{dónde} ocurrió. La idea de Hamming es usar varios bits de paridad, cada uno cubriendo un subconjunto distinto de posiciones, elegidos de manera tal que la combinación de paridades que falla indique, en binario, la posición exacta del bit erróneo. A continuación se analiza el código Hamming(7,4).
+Con un solo bit de paridad podemos \emph{detectar} un error, pero no sabemos \emph{dónde} ocurrió. La idea de Hamming es usar varios bits de paridad, cada uno cubriendo un subconjunto distinto de posiciones, elegidos de manera tal que la combinación de paridades que falla (el \emph{síndrome}) identifique la posición exacta del bit erróneo. A continuación se analiza el código Hamming(7,4).
   
 Definimos primero la matriz $P$ ($4\times 3$):
 \[
 P = \begin{pmatrix}1&1&0\\1&0&1\\0&1&1\\1&1&1\end{pmatrix}
 \]
-y a partir de se definen la matriz generadora $P$ y la matriz de verificación $H$ como:
+y a partir de ella se definen la matriz generadora $G$ y la matriz de verificación $H$ como:
 \[
 G = \left(I_4\mid P\right) = \begin{pmatrix}
 1&0&0&0&1&1&0\\
@@ -169,7 +171,7 @@ H = \begin{pmatrix}P\\I_3\end{pmatrix} = \begin{pmatrix}
 El algoritmo es entonces:
 \begin{itemize}
 \item \emph{Codificar:} dado un mensaje $m=(m_1,m_2,m_3,m_4)$,
-transmitir el codeword $c=mG$ (de largo $7$) donde el cálculo es en aritmética modúlo 2.
+transmitir el codeword $c=mG$ (de largo $7$) donde el cálculo es en aritmética módulo 2.
 \item \emph{Decodificar:} el receptor recibe $r$ y calcula el
 síndrome $s=rH$.
 \end{itemize}
@@ -261,7 +263,7 @@ $\hat H(0)=G$.
 vale $\mu_y$? Explicar por qué este resultado no depende de $G$ ni de
 la forma particular de $\hat H(f)$, sino que es una propiedad general
 de cualquier sistema LTI.
-\item Supongamos ahora que $\hat H(f)$ es un pasabanda ideal de
+\item Supongamos ahora que $\hat H(f)$ es un pasabajos ideal de
 ganancia $G$ que anula toda la potencia de $x(t)$ fuera de la banda
 $[-B,B]$. Escribir la potencia de salida $P_y$ en términos de $G$ y de
 la potencia de $x(t)$ contenida en esa banda.
@@ -269,14 +271,14 @@ la potencia de $x(t)$ contenida en esa banda.
 \end{ejercicio}
  
 \begin{ejercicio}[Ruido blanco filtrado: probabilidad de exceder un umbral]
-Un ruido blanco gaussiano con $\eta_0/2 = 2\times10^{-9}\
-\unit{\watt\per\hertz}$ pasa por un filtro pasabajos ideal de ganancia
+Un ruido blanco gaussiano con $\eta_0/2 = 2\times10^{-12}\
+\unit{\square\volt\per\hertz}$ pasa por un filtro pasabajos ideal de ganancia
 $1$ y ancho de banda $B=1\ \unit{\mega\hertz}$. Sea $n(t)$ la salida.
- 
+
 \begin{enumerate}
-\item Calcular la potencia de ruido $N$ a la salida.
-\item Calcular $\p{|n(t)|>3\times10^{-3}}$ en términos de la función
-$Q$, usando la simetría de la distribución Gaussiana.
+\item Calcular la potencia de ruido $N$ a la salida y el valor eficaz $\sigma$ de $n(t)$.
+\item Calcular $\p{|n(t)|>6\ \unit{\milli\volt}}$ en términos de la función
+$Q$, usando la simetría de la distribución Gaussiana, y evaluarla numéricamente.
 \end{enumerate}
 \end{ejercicio}
 
@@ -391,7 +393,7 @@ Se considera el pulso de duración $T$, dado en $|t|\leqslant \frac{T}{2}$ por $
 
          Demostrar que en este caso se tiene ISI al detectar con la frecuencia $f_s$. Si ahora se transmite la señal $\tilde{x}(t)=\sum_k a_k p(t-k T'_s)$ con el mismo pulso $p(t)$, hallar $T'_s$ para que no haya ISI en la detección. A partir de ahora trabajamos con la señal $\tilde{x}(t)$.
         \item Hallar y bosquejar la densidad espectral de potencia de onda PAM recibida luego de pasar por el canal.
-        \item ¿Es posible obtener sincronismo a partir de la señal recibida? Si las probabilidades fueran diferentes, ¿es posible que haya forma de sincronizar el detector? 
+        \item ¿Tiene la densidad espectral de la señal recibida componentes discretas en $f'_s$ que permitan obtener el sincronismo del detector con un filtro angosto? Si las probabilidades fueran diferentes, ¿cambiaría la respuesta? (En el capítulo de sincronización se verá que el \emph{cuadrado} de la señal puede tener esa componente aunque la señal no la tenga: ¿qué condición sobre el ancho de banda del pulso recibido se necesita?)
         \item Hallar la eficiencia espectral del sistema y compararla con el caso en que el canal fuera ideal ($\hat{H}(f) = 1 \,\, \forall f$) y pudiéramos usar la frecuencia $f_s$ original.
         \item Sabiendo de antemano que el canal tiene la transferencia de la primera parte y sin modificar la forma de los pulsos, ¿Es posible modificar el receptor de manera que no haya ISI utilizando la frecuencia $f_s$ original? Explicar.
         \end{enumerate}
@@ -406,7 +408,7 @@ Sea la onda PAM $x(t)=\sum_k a_k p(t-k T_s)$ con el pulso
 
 \begin{enumerate}
 \item Determinar el mínimo valor de $T_s$ en función de $B$ para que no haya ISI. A partir de ahora se utiliza ese valor.
-\item Si $a_k$ puede tomar los valores $0$, $A$ y $2A$ con igual probabilidad e independencia entre un sorteo y otro, hallar y bosquejar la densidad espectral de potencia de onda PAM resultante. ¿Se puede obtener una señal para sincronizar el detector a partir de la onda recibida?
+\item Si $a_k$ puede tomar los valores $0$, $A$ y $2A$ con igual probabilidad e independencia entre un sorteo y otro, hallar y bosquejar la densidad espectral de potencia de onda PAM resultante. ¿Tiene la onda una componente discreta en $f_s$ que permita sincronizar el detector?
 \item Hallar la potencia de la onda y la energía media del pulso transmitido.
 \item Hallar la eficiencia espectral. Comparar con la que se hubiera obtenido usando pulsos de Nyquist ideales con el mismo ancho de banda.
 \end{enumerate}
@@ -420,8 +422,8 @@ Sea la onda PAM $x(t)=\sum_k a_k p(t-k T_s)$, con el pulso
 Para todas las partes salvo la 5., se utilizará $\alpha=\frac{1}{2}$.
 
 \begin{enumerate}
-\item Para Hallar $P(f)$, y determinar el mínimo valor de $T_s$ en función de $B$ para que no haya ISI. En lo que sigue se utilizara ese valor.
-\item Si $a_k$ puede tomar los valores $-A,A$ en forma independiente y equiprobable, hallar y bosquejar la densidad espectral de potencia de onda PAM resultante. ¿Se puede obtener una señal para sincronizar el detector a partir de la onda recibida? Justificar.
+\item Hallar $P(f)$, y determinar el mínimo valor de $T_s$ en función de $B$ para que no haya ISI. En lo que sigue se utilizara ese valor.
+\item Si $a_k$ puede tomar los valores $-A,A$ en forma independiente y equiprobable, hallar y bosquejar la densidad espectral de potencia de onda PAM resultante. ¿Tiene la onda una componente discreta en $f_s$ que permita sincronizar el detector? Justificar.
 \item Si ahora $a_k$ toma valores independientes $\{-A,A\}$ pero con probabilidades $1/3$ y $2/3$ respectivamente, cambia la respuesta a la parte 2? Justificar.
 \item Hallar la potencia de la onda, y la energía media del pulso transmitido para las señales de 2 y 3.
 \item Se considera ahora $\alpha>0$ cualquiera. Hallar $P(f)$ y determinar el mínimo valor de $T_s$ en función de $B$ para que no haya ISI. Discutir el tema de la sincronización del detector en este caso.
@@ -432,7 +434,7 @@ Para todas las partes salvo la 5., se utilizará $\alpha=\frac{1}{2}$.
 \section{Error en detección sincrónica en presencia de ruido}
 
 \begin{ejercicio}
-Se considera un sistema de trasmisión digital con señalización binaria unipolar $a_k=\{0,A\}$, pulsos rectangulares NRZ, y donde el ruido en el detector es Gaussiano con media nula y varianza $\sigma^2$. Si la probabilidad de error de símbolo es $P_e=1\times 10^{-5}$, calcular la relación $\left(\frac{A}{\sigma}\right)$. Si en cambio se usa señalización polar con igual relación señal/ruido, ¿cuál es la probabilidad de error de símbolo?        
+Se considera un sistema de trasmisión digital con señalización binaria unipolar $a_k=\{0,A\}$, pulsos rectangulares NRZ, y donde el ruido en el detector es Gaussiano con media nula y varianza $\sigma^2$. Si la probabilidad de error de símbolo es $P_e=1\times 10^{-5}$, calcular la relación $\left(\frac{A}{\sigma}\right)$. Si en cambio se usa señalización polar con igual relación señal a ruido (es decir, con la misma potencia media de señal y el mismo ruido), ¿cuál es la probabilidad de error de símbolo? ¿Y si se mantiene la misma separación $A$ entre los dos niveles?
 \end{ejercicio}
 
 \begin{ejercicio}
@@ -478,18 +480,19 @@ f_N(n)= \frac{1}{\sqrt{2\sigma^2}} e^{-\sqrt{2}|n|/\sigma}
 
 \begin{ejercicio}
 Se recibe una señal $\sum_k a_k p(t-kT_s)$, con símbolos unipolares binarios $a_k
-\in \{0,A\}$, y pulsos triangulares $ p(t)=1 - \frac{|t|}{T_s}$, contaminada con ruido blanco de densidad espectral $\frac{\eta_0}{2}$.
+\in \{0,A\}$, y pulsos triangulares $ p(t)=1 - \frac{|t|}{T_s}$ para $|t|\leqslant T_s$ (de duración $2T_s$), contaminada con ruido blanco de densidad espectral $\frac{\eta_0}{2}$.
 \begin{enumerate}
-\item Especificar el detector óptimo para esta forma de pulso.
-\item Calcular la probabilidad de error de símbolo en función de los parámetros $A$, $T_s$ y $\eta$.
-\end{enumerate} 
+\item Especificar el detector óptimo (filtro acoplado) para esta forma de pulso.
+\item Calcular la probabilidad de error de símbolo en función de los parámetros $A$, $T_s$ y $\eta_0$, suponiendo que no hay interferencia intersimbólica.
+\item Verificar que el pulso $p(t)$ cumple la condición de ISI nula, pero que el pulso a la salida del filtro acoplado no la cumple. Calcular la ISI en el instante de muestreo y discutir si la fórmula de la parte anterior es válida. Comparar con el pulso de duración $T_s$ del Ejercicio~\ref{ej:triangular corto}.
+\end{enumerate}
 \end{ejercicio}
 
 \begin{ejercicio}
-Un sistema de comunicación digital binario utiliza un canal con ruido blanco gaussiano de densidad espectral de potencia $\eta/2=10^{-15}$ $V^2/\unit{\Hz}$. La velocidad de señalización es $1\times 10^6$ Baudios, y los pulsos son rectangulares NRZ.
+Un sistema de comunicación digital binario utiliza un canal con ruido blanco gaussiano de densidad espectral de potencia $\eta_0/2=10^{-15}\ \unit{\square\volt/\hertz}$. La velocidad de señalización es $1\times 10^6$ Baudios, y los pulsos son rectangulares NRZ.
 \begin{enumerate}
 \item Calcular la potencia necesaria para que la probabilidad de error de símbolo $P_e$ sea menor que $1\times 10^{-6}$ si se utiliza señalización unipolar. Recalcular para señalización polar.
-\item ¿Cuál sería la potencia necesaria para mantener la misma velocidad de transmisión de información con igual probabilidad de error $P_e$ usando señalización M-aria, con una constelación de 8 símbolos de amplitudes $\{\pm 1,\pm 3,\pm 5,\pm 7\}$.
+\item ¿Cuál sería la potencia necesaria para mantener la misma velocidad de transmisión de información con igual probabilidad de error de \emph{bit} ($10^{-6}$, usando codificación de Gray) usando señalización M-aria, con una constelación de 8 símbolos de amplitudes $\{\pm A,\pm 3A,\pm 5A,\pm 7A\}$? Comparar en $\unit{\decibel}$ con el caso polar binario.
 \end{enumerate}
 \end{ejercicio}
 
@@ -528,7 +531,7 @@ y encuentre una expresión para la probabilidad de error $P_e$.
 \end{enumerate}
 \end{ejercicio}
 
-\begin{ejercicio}
+\begin{ejercicio}\label{ej:triangular corto}
 
 Se considera un canal digital de banda base contaminado con ruido blanco de densidad espectral $\eta_0/2 = 10^{-5}\,\unit{\square\volt/\hertz}$. Se utiliza señalización polar con símbolos equiprobables de amplitud $A=3.0\,V$ en la recepción, y velocidad de señalización $f_s=10\,\unit{\kilo\baud}$. Se utilizan pulsos triangulares de la forma:
 \begin{equation*}
@@ -557,7 +560,7 @@ Un sistema de señalización binaria BPSK trasmite información a una velocidad 
 \end{ejercicio}
 
 \begin{ejercicio}
-En la detección BPSK coherente, investigar el efecto de un error de fase $\theta$ entre el oscilador local y la portadora. Hallar la expresión para la probabilidad de error de detección.
+En la detección BPSK coherente, investigar el efecto de un error de fase $\theta$ entre el oscilador local y la portadora. Hallar la expresión para la probabilidad de error de detección en función de $\theta$ y de $\gamma=\bar E_b/\eta_0$. ¿Cuántos $\unit{\decibel}$ de energía de bit adicional se necesitan para compensar un error de fase de $20^\circ$? ¿Qué pasa si $\theta=\pi$?
 \end{ejercicio}
 
 \begin{ejercicio}
@@ -569,8 +572,8 @@ Aquí $p_R(t)$ es el pulso rectangular NRZ.
 \begin{enumerate}
 \item Se dispone de dos generadores locales, $\cos(\omega_c t+\pi/4)$ y $\cos(\omega_c t+3\pi/4)$. Diseñar en diagrama de bloques un detector sincrónico
 apropiado usando filtros acoplados.
-\item Para el detector diseñado, calcular la probabilidad de error de símbolo y expresarla en función del parámetro
-$\gamma:=\frac{\overline{E}_p}{\eta}$.
+\item Si el canal agrega ruido blanco gaussiano de densidad espectral $\eta_0/2$, calcular la probabilidad de error de símbolo del detector diseñado y expresarla en función de la relación
+$\gamma_s:=\frac{\bar{E}_p}{\eta_0}$, siendo $\bar E_p$ la energía media del pulso de RF transmitido. Expresarla también en función de $\gamma=\bar E_b/\eta_0$ y comparar con las notas.
 \end{enumerate}
 \end{ejercicio}
 
@@ -593,14 +596,14 @@ bits mediante esta constelación.
 espectral de potencia de la señal digital correspondiente.
 \item Dise{ñ}ar en diagrama de bloques un detector apropiado para este sistema.
 \item Si el canal presenta ruido blanco gaussiano de densidad espectral de
-potencia $\eta/2$, hallar una fórmula para la probabilidad $P_e$
+potencia $\eta_0/2$, hallar una fórmula para la probabilidad $P_e$
 de error de símbolo para el sistema, en función de
-$\gamma:=\frac{\bar{E}_p}{\eta}$, siendo $\bar{E}_p$ la energía
-media de los pulsos.
-\item Evaluar numéricamente la curva $P_e(\gamma)$ de (d), y comparar con
-la correspondiente a modulación 8PSK. ?`Cuál es mejor?
+$\gamma_s:=\frac{\bar{E}_p}{\eta_0}$, siendo $\bar{E}_p$ la energía
+media de los pulsos de RF.
+\item Evaluar numéricamente la curva $P_e(\gamma_s)$ de la parte anterior, y comparar con
+la correspondiente a modulación 8PSK. ¿Cuál es mejor? ¿Por cuántos $\unit{\decibel}$, para $P_e=10^{-5}$?
 \item Comparar también con la curva para una transmisión de banda
-base polar, con $M=8$ símbolos. ?`Es justa esta comparación en
+base polar, con $M=8$ símbolos. ¿Es justa esta comparación en
 términos de eficiencia espectral?
 \end{enumerate}
 \end{ejercicio}
@@ -611,10 +614,10 @@ En los sistemas coherentes donde se debe enviar una pequeña señal piloto para 
         x_c(t) = \sum_k a_k\sqrt{1-\mu^2}p_R(t-kT_s)\cos(\omega_c t)+\mu
         A\sin(\omega_c t),
 \end{equation*}
-donde $a_k=\{+A,-A\}$, $0<\mu<1$, y $p_R(t)$ es el pulso rectangular NRZ de largo $T_s$. Calcule la probabilidad de error de símbolo en función de la densidad espectral de potencia del ruido $\frac{\eta}{2}$ y la potencia media trasmitida. Compare el resultado con el que se obtendría si no se enviara la portadora piloto $s_c(t)=\mu A\sin(\omega_c t)$.
+donde $a_k=\{+A,-A\}$, $0<\mu<1$, y $p_R(t)$ es el pulso rectangular NRZ de largo $T_s$. Calcule la probabilidad de error de símbolo en función de la densidad espectral de potencia del ruido $\frac{\eta_0}{2}$ y la potencia media trasmitida $S$. Compare el resultado con el que se obtendría si no se enviara la portadora piloto $s_c(t)=\mu A\sin(\omega_c t)$.
 \end{ejercicio}
 
-\begin{ejercicio}
+\begin{ejercicio}\label{ej:dbpsk}
 El sistema de la figura es un detector diferencial no coherente para
 señales BPSK.
 
@@ -660,10 +663,12 @@ m\'ultiplo de $\omega_s$. Ignoramos por el momento el ruido. Sea $z_k$ el valor 
 \item Supongamos que se detecta la secuencia $m_1, m_2, \ldots, m_8 = 11000110$. Asumiendo que $a_0=1$, determinar cuál fue el mensaje $a_1, a_2, \ldots, a_8$ transmitido.
 
 \item Consideramos ahora el ruido Gaussiano. Mediante un estudio que no se hará aquí, se puede obterner la fórmula
-de probabilidad de error $ P_e = \frac{1}{2}\exp\left(-\frac{\bar{E}_p}{\eta}\right)$, donde $\bar{E}_p$ es la energía media del pulso transmitido, y
-$\frac{\eta}{2}$ la densidad espectral de potencia del ruido blanco del canal. Tomando valores para $P_e = 10^{-i}, \ i=2,\ldots,10$, hacer una gráfica que compare los requerimientos de $\bar{E}_p/{\eta}$ con el caso del detector BPSK coherente. ¿Cuál es más eficiente?
+de probabilidad de error $ P_e = \frac{1}{2}\exp\left(-\frac{\bar{E}_p}{\eta_0}\right)$, donde $\bar{E}_p$ es la energía media del pulso transmitido, y
+$\frac{\eta_0}{2}$ la densidad espectral de potencia del ruido blanco del canal. Tomando valores para $P_e = 10^{-i}, \ i=2,\ldots,10$, hacer una gráfica que compare los requerimientos de $\bar{E}_p/{\eta_0}$ con el caso del detector BPSK coherente. ¿Cuál es más eficiente?
 
-\item Evaluar la potencia media requerida en el detector de arriba para una transmisión binaria de 100kbps y  un nivel de ruido $\frac{\eta}{2}=10^{-12}\text{V}^2/\text{Hz}$, si se desea $P_e=10^{-3}$.
+\item Evaluar la potencia media requerida en el detector de arriba para una transmisión binaria de $100\ \unit{\kilo\bps}$ y  un nivel de ruido $\frac{\eta_0}{2}=10^{-12}\ \unit{\square\volt/\hertz}$, si se desea $P_e=10^{-3}$.
+
+\item Relacionar este detector con el problema de la ambigüedad de fase del capítulo de sincronización: ¿qué ocurre con $m_k$ si la portadora llega con una fase constante desconocida $\theta$?
 \end{enumerate}
 
 \end{ejercicio}
@@ -673,16 +678,16 @@ Un broadcaster tiene un flujo de video de 30 Mbps que se desea transportar via s
 \begin{enumerate}
 \item Indicar el ancho de banda $B$ necesario en el canal pasabanda para este transporte.
 \item Bosquejar la densidad espectral de potencia de la señal modulada.
-\item Proponer un detector coherente para estos pulsos que no introduzca ISI, y deducir la fórmula para la probabilidad de error de detección en base a los parámetros de modulación, en particular la amplitud $A$ de los pulsos recibidos y la densidad espectral de potencia del ruido blanco en el canal. Evaluar para el caso $A=3V$ y $\frac{\eta}{2} = 10^{-4}\unit{\square\volt/\hertz}$.
-\item Luego de realizados los cálculos, el proveedor de espacio satelital avisa que no podr'a ofrecer el ancho de banda $B$, pero si se podrá ofrecer dos espacios de ancho de banda $\frac{B}{2}$. ¿Es posible transmitir los 30 Mbps entre esos dos canales mediante modulación 4QAM en c/u, con el mismo rolloff en
-los pulsos de Nyquist? Si es así indicar cómo hacerlo.
+\item Proponer un detector coherente para estos pulsos que no introduzca ISI, y deducir la fórmula para la probabilidad de error de detección en base a los parámetros de modulación, en particular la amplitud $A$ de los pulsos recibidos y la densidad espectral de potencia del ruido blanco en el canal. Evaluar para el caso $A=3\ \unit{\volt}$ y $\frac{\eta_0}{2} = 10^{-8}\ \unit{\square\volt/\hertz}$.
+\item Luego de realizados los cálculos, el proveedor de espacio satelital avisa que no podrá ofrecer el ancho de banda $B$, pero sí podrá ofrecer dos espacios de ancho de banda $\frac{B}{2}$. ¿Es posible transmitir los 30 Mbps entre esos dos canales mediante modulación 4QAM en c/u, con el mismo rolloff en
+los pulsos de Nyquist? Si es así indicar cómo hacerlo. ¿Cómo cambia la probabilidad de error si se mantiene la potencia \emph{total} transmitida? ¿Y si se mantiene la amplitud $A$ en cada canal?
 \end{enumerate}
 \end{ejercicio}
 
 \begin{ejercicio}
 Sea un sistema de transmisión digital pasabanda, en donde envía la señal con envolvente compleja
 \begin{equation*}
-x_{ce}(t)=\sum z_k p_{[0,T_s]}(t),
+x_{ce}(t)=\sum_k z_k\, p_{[0,T_s]}(t-kT_s),
 \end{equation*}
 en donde los símbolos complejos $z_k$ son independientes y equiprobables. Se utiliza la siguiente constelación de símbolos
 
@@ -716,12 +721,12 @@ en donde los símbolos complejos $z_k$ son independientes y equiprobables. Se ut
 \end{figure}
 
 \begin{enumerate}
-\item Buscar una codificación de Gray adecuada para el diagrama, hallar $S_z(\varphi)$ y la energía por bit $\bar{E_b}$ .
+\item Buscar una codificación de Gray adecuada para el diagrama, hallar la densidad espectral de potencia de la envolvente compleja $S_{x_{ce}}(f)$ y la energía media por bit $\bar{E}_b$ de la señal de RF.
 \item Diseñar un diagrama de bloques de un demodulador especificando los umbrales y los filtros utilizados.
 \item Expresar la probabilidad de error en función de A y $\sigma$ para $a_k$ y $b_k $ y dar una aproximación para el error de símbolo. Suponer que se tiene ruido blanco Gaussiano aditivo con varianza $\sigma^2$.
 \item Para $A=6$ y $\sigma=1$, evaluar la probabilidad de error de símbolo y compararla con la probabilidad que se obtiene si se desprecian los errores que se escapan del cuadrante del símbolo.
-\item Expresar la probabilidad anterior en función de $\bar{E_p}$ y $\eta$, donde $\frac{\eta}{2}$ es la densidad espectral del ruido.
-\item Suponiendo que $a_k$ y $b_k$ tienen sus valores en $(2A,\alpha A, -\alpha A, 2A)$, hallar el alfa que hace óptimo la probabilidad de error de símbolo, especificando cual es esta probabilidad.
+\item Expresar la probabilidad anterior en función de $\bar{E}_p$ y $\eta_0$, donde $\frac{\eta_0}{2}$ es la densidad espectral del ruido y el detector utiliza filtros acoplados.
+\item Suponiendo ahora que $a_k$ y $b_k$ toman sus valores en $\{-2A,-\alpha A, \alpha A, 2A\}$, con los niveles exteriores fijos, hallar (aproximadamente, para $A\gg\sigma$) el $\alpha$ que minimiza la probabilidad de error de símbolo, especificando cuál es esta probabilidad. ¿Cómo cambia la energía media por bit respecto a la constelación original?
 \end{enumerate}
 \end{ejercicio}
 
